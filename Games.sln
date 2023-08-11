@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invaders.WinFormsApp", "Invaders.WinFormsApp\Invaders.WinFormsApp.csproj", "{A2BDD30F-B9A7-485D-AC8E-F40B86174A05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangman.WinFormsApp", "Hangman.WinFormsApp\Hangman.WinFormsApp.csproj", "{2186B5FD-6FA5-4F0D-AFD1-095092AD17C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A2BDD30F-B9A7-485D-AC8E-F40B86174A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2BDD30F-B9A7-485D-AC8E-F40B86174A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2BDD30F-B9A7-485D-AC8E-F40B86174A05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2186B5FD-6FA5-4F0D-AFD1-095092AD17C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2186B5FD-6FA5-4F0D-AFD1-095092AD17C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2186B5FD-6FA5-4F0D-AFD1-095092AD17C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2186B5FD-6FA5-4F0D-AFD1-095092AD17C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
