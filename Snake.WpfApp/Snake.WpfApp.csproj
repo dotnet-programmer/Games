@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\Background.jpg" />
+    <None Remove="Resources\Images\Body.png" />
+    <None Remove="Resources\Images\DeadBody.png" />
+    <None Remove="Resources\Images\DeadHead.png" />
+    <None Remove="Resources\Images\DeadTail.png" />
+    <None Remove="Resources\Images\Empty.png" />
+    <None Remove="Resources\Images\Food.png" />
+    <None Remove="Resources\Images\Head.png" />
+    <None Remove="Resources\Images\icon.ico" />
+    <None Remove="Resources\Images\Tail.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\Background.jpg" />
+    <Resource Include="Resources\Images\Body.png" />
+    <Resource Include="Resources\Images\DeadBody.png" />
+    <Resource Include="Resources\Images\DeadHead.png" />
+    <Resource Include="Resources\Images\DeadTail.png" />
+    <Resource Include="Resources\Images\Empty.png" />
+    <Resource Include="Resources\Images\Food.png" />
+    <Resource Include="Resources\Images\Head.png" />
+    <Resource Include="Resources\Images\icon.ico" />
+    <Resource Include="Resources\Images\Tail.png" />
+  </ItemGroup>
+
+</Project>

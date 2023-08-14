@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="Snake.WpfApp.Views.UserControls.GameStateControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:viewmodels="clr-namespace:Snake.WpfApp.ViewModels"
+			 xmlns:converters="clr-namespace:Snake.WpfApp.Views.Converters"
+			 d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+			 mc:Ignorable="d"
+			 d:DesignHeight="100"
+			 d:DesignWidth="400">
+
+	<Grid x:Name="GameStateGrid">
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+
+		<Grid x:Name="GameScoreAndSpeedGrid"
+			  Grid.Column="0"
+			  Visibility="{Binding TopTextScoreVisibile, Converter={converters:BoolToVisibilityConverter}}">
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+
+			<TextBlock x:Name="TxtScore"
+					   Grid.Column="0"
+					   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}">
+			<Run Text="Score:" />
+			<Run Text="{Binding CurrentScore, Mode=OneWay}" />
+			</TextBlock>
+
+			<TextBlock x:Name="TxtSpeed"
+					   Grid.Column="1"
+					   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}">
+			<Run Text="Speed:" />
+			<Run Text="{Binding SnakeSpeed, Mode=OneWay}" />
+			</TextBlock>
+		</Grid>
+
+		<TextBlock x:Name="TopTextTitle"
+				   Grid.Column="0"
+				   Text="Snake"
+				   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}"
+				   Visibility="{Binding TopTextTitleVisibile, Converter={converters:BoolToVisibilityConverter}}" />
+
+		<StackPanel Grid.Column="1"
+					Orientation="Horizontal"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Top"
+					Background="Black">
+
+			<Button x:Name="BtnMinimize"
+					Content="__"
+					Style="{StaticResource ResourceKey=BtnMinimizeStyle}"
+					Command="{Binding MinimizeWindowCommand}"
+					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+
+			<Button x:Name="BtnClose"
+					Content="X"
+					Style="{StaticResource ResourceKey=BtnCloseStyle}"
+					Command="{Binding CloseWindowCommand}"
+					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+		</StackPanel>
+	</Grid>
+</UserControl>
