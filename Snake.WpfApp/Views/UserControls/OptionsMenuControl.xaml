@@ -1,13 +1,15 @@
 ﻿<UserControl x:Class="Snake.WpfApp.Views.UserControls.OptionsMenuControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:viewmodels="clr-namespace:Snake.WpfApp.ViewModels"
-             d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:viewmodels="clr-namespace:Snake.WpfApp.ViewModels"
+			 xmlns:converters="clr-namespace:Snake.WpfApp.Views.Converters"
+			 d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
 			 mc:Ignorable="d"
-			 d:DesignHeight="450"
-			 d:DesignWidth="800">
+			 x:Name="ControlOptionsMenu"
+			 d:DesignHeight="600"
+			 d:DesignWidth="600">
 
 	<UserControl.Resources>
 		<Style TargetType="{x:Type StackPanel}">
@@ -18,7 +20,8 @@
 		</Style>
 	</UserControl.Resources>
 
-	<Grid Background="Black">
+	<Grid x:Name="GridMain"
+		  Background="Black">
 
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
@@ -29,77 +32,100 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Grid.Row="0"
+		<TextBlock x:Name="TxtInfo"
+				   Grid.Row="0"
 				   Text="Options"
 				   Style="{StaticResource TxtTopMenuPositionsStyle}" />
 
-		<StackPanel Grid.Row="1">
-			<TextBlock Text="Snake speed:"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+		<StackPanel x:Name="PanelSnakeSpeed"
+					Grid.Row="1">
 
-			<Button Content="-"
+			<TextBlock x:Name="TxtSnakeSpeed"
+					   Text="Snake speed:"
+					   Style="{StaticResource BasicTextBlock}" />
+
+			<Button x:Name="BtnDecreaseSnakeSpeed"
+					Content="-"
 					Command="{Binding DecreaseSnakeSpeedCommand}"
 					Style="{StaticResource BtnOptionsMenuStyle}" />
 
-			<TextBlock Text="{Binding SnakeSpeed, Mode=TwoWay}"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+			<TextBlock x:Name="TxtSnakeSpeedValue"
+					   Text="{Binding Options.SnakeSpeed, Mode=OneWay}"
+					   Style="{StaticResource BasicTextBlock}" />
 
-			<Button Content="+"
+			<Button x:Name="IncreaseSnakeSpeed"
+					Content="+"
 					Command="{Binding IncreaseSnakeSpeedCommand}"
 					Style="{StaticResource BtnOptionsMenuStyle}" />
 		</StackPanel>
 
-		<StackPanel Grid.Row="2">
-			<TextBlock Text="Playfield borders:"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+		<StackPanel x:Name="PanelPlayfieldBorders"
+					Grid.Row="2">
 
-			<CheckBox BorderBrush="Green"
+			<TextBlock x:Name="TxtPlayfieldBorders"
+					   Text="Playfield borders:"
+					   Style="{StaticResource BasicTextBlock}" />
+
+			<CheckBox x:Name="ChIsFieldHaveBorder"
+					  BorderBrush="Green"
 					  BorderThickness="2"
 					  VerticalAlignment="Center"
 					  HorizontalAlignment="Center"
 					  Margin="10,0,0,0"
-					  IsChecked="{Binding IsFieldHaveBorder}" />
+					  IsChecked="{Binding Options.IsFieldHaveBorder}" />
 		</StackPanel>
 
-		<StackPanel Grid.Row="3">
-			<TextBlock Text="Game size:"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+		<StackPanel x:Name="PanelGameGridSize"
+					Grid.Row="3">
 
-			<Button Content="&lt;"
+			<TextBlock x:Name="TxtGameGridSize"
+					   Text="Game size:"
+					   Style="{StaticResource BasicTextBlock}" />
+
+			<Button x:Name="BtnDecreaseGameGridSize"
+					Content="&lt;"
 					Style="{StaticResource BtnOptionsMenuStyle}"
 					Command="{Binding DecreaseGameGridSizeCommand}"
 					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 
-			<TextBlock Text="{Binding GameGridSize, Mode=OneWay}"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+			<TextBlock x:Name="TxtGameGridSizeValue"
+					   Text="{Binding Options.GameGridSize, Mode=OneWay}"
+					   Style="{StaticResource BasicTextBlock}" />
 
-			<Button Content="&gt;"
+			<Button x:Name="BtnIncreaseGameGridSize"
+					Content="&gt;"
 					Style="{StaticResource BtnOptionsMenuStyle}"
 					Command="{Binding IncreaseGameGridSizeCommand}"
 					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 		</StackPanel>
 
-		<StackPanel Grid.Row="4">
-			<TextBlock Text="Music:"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+		<StackPanel x:Name="PanelSoundVolume"
+					Grid.Row="4">
 
-			<Button Content="&lt;"
+			<TextBlock x:Name="TxtSoundVolume"
+					   Text="Music:"
+					   Style="{StaticResource BasicTextBlock}" />
+
+			<Button x:Name="BtnDecreaseSoundVolume"
+					Content="&lt;"
 					Style="{StaticResource BtnOptionsMenuStyle}"
 					Command="{Binding DecreaseSoundVolumeCommand}"
 					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 
-			<TextBlock Text="{Binding SoundVolume, Mode=OneWay}"
-					   Style="{StaticResource TxtMenuPositionsStyle}" />
+			<TextBlock x:Name="TxtSoundVolumeValue"
+					   Text="{Binding Options.SoundVolume, StringFormat={}{0} %, Converter={converters:SoundValueConverter}, Mode=OneWay}"
+					   Style="{StaticResource BasicTextBlock}" />
 
-			<Button Content="&gt;"
+			<Button x:Name="BtnIncreaseSoundVolume"
+					Content="&gt;"
 					Style="{StaticResource BtnOptionsMenuStyle}"
 					Command="{Binding IncreaseSoundVolumeCommand}"
 					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 		</StackPanel>
 
-		<Button Grid.Row="5"
+		<Button x:Name="BtnSaveOptionsAndShowMainMenu"
+				Grid.Row="5"
 				Content="Main menu"
-				Style="{StaticResource BtnMenuStyle}"
 				Command="{Binding SaveOptionsCommand}" />
 	</Grid>
 </UserControl>

@@ -6,10 +6,12 @@
 			 xmlns:viewmodels="clr-namespace:Snake.WpfApp.ViewModels"
 			 d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
 			 mc:Ignorable="d"
-			 d:DesignHeight="450"
-			 d:DesignWidth="800">
+			 x:Name="ControlHighScores"
+			 d:DesignHeight="600"
+			 d:DesignWidth="600">
 
-	<Grid Background="Black">
+	<Grid x:Name="GridMain"
+		  Background="Black">
 
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*" />
@@ -17,27 +19,32 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<TextBlock Grid.Row="0"
+		<TextBlock x:Name="TxtInfo"
+				   Grid.Row="0"
 				   Text="High scores"
 				   Style="{StaticResource TxtTopMenuPositionsStyle}" />
 
-		<ItemsControl Grid.Row="1"
+		<ItemsControl x:Name="ListHighScores"
+					  Grid.Row="1"
 					  VerticalAlignment="Center"
 					  ItemsSource="{Binding HighScoreList}">
 
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<Grid>
+					<Grid x:Name="GridHighScores">
+
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="2*" />
 							<ColumnDefinition />
 						</Grid.ColumnDefinitions>
 
-						<TextBlock Grid.Column="0"
+						<TextBlock x:Name="TxtPlayerName"
+								   Grid.Column="0"
 								   Text="{Binding PlayerName}"
 								   Style="{StaticResource ResourceKey=TxtHighScoreStyle}" />
 
-						<TextBlock Grid.Column="1"
+						<TextBlock x:Name="TxtScore"
+								   Grid.Column="1"
 								   HorizontalAlignment="Left"
 								   Text="{Binding Score}"
 								   Style="{StaticResource ResourceKey=TxtHighScoreStyle}" />
@@ -46,9 +53,9 @@
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
 
-		<Button Grid.Row="2"
+		<Button x:Name="BtnShowMainMenu"
+				Grid.Row="2"
 				Content="Main menu"
-				Command="{Binding ShowMainMenuCommand}"
-				Style="{StaticResource BtnMenuStyle}" />
+				Command="{Binding ShowMainMenuCommand}" />
 	</Grid>
 </UserControl>

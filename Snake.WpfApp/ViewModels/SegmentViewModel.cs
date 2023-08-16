@@ -6,7 +6,7 @@ namespace Snake.WpfApp.ViewModels;
 
 internal class SegmentViewModel : BaseViewModel
 {
-	public SegmentViewModel(int xPos, int yPos, SegmentKind snakeSegmentKind, int segmentSize = 20)
+	public SegmentViewModel(int xPos, int yPos, int segmentSize, SegmentKind snakeSegmentKind)
 	{
 		XPos = xPos;
 		YPos = yPos;

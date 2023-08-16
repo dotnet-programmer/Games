@@ -2,24 +2,32 @@
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:viewmodels="clr-namespace:Snake.WpfApp.ViewModels"
 			 xmlns:converters="clr-namespace:Snake.WpfApp.Views.Converters"
 			 d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
 			 mc:Ignorable="d"
+			 x:Name="ControlGameState"
 			 d:DesignHeight="100"
 			 d:DesignWidth="400">
 
-	<Grid x:Name="GameStateGrid">
+	<UserControl.Resources>
+		<Style TargetType="{x:Type TextBlock}"
+			   BasedOn="{StaticResource ResourceKey=TxtMenuPanelStyle}">
+		</Style>
+	</UserControl.Resources>
+
+	<Grid x:Name="GridMain">
 
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition />
 			<ColumnDefinition Width="Auto" />
 		</Grid.ColumnDefinitions>
 
-		<Grid x:Name="GameScoreAndSpeedGrid"
+		<Grid x:Name="GridGameScoreAndSpeed"
 			  Grid.Column="0"
-			  Visibility="{Binding TopTextScoreVisibile, Converter={converters:BoolToVisibilityConverter}}">
+			  Visibility="{Binding TopTextScoreVisible, Converter={converters:BoolToVisibilityConverter}}">
 
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition />
@@ -27,43 +35,44 @@
 			</Grid.ColumnDefinitions>
 
 			<TextBlock x:Name="TxtScore"
-					   Grid.Column="0"
-					   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}">
-			<Run Text="Score:" />
-			<Run Text="{Binding CurrentScore, Mode=OneWay}" />
+					   Grid.Column="0">
+				<Run Text="Score:" />
+				<Run Text="{Binding CurrentScore, Mode=OneWay}" />
 			</TextBlock>
 
 			<TextBlock x:Name="TxtSpeed"
-					   Grid.Column="1"
-					   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}">
-			<Run Text="Speed:" />
-			<Run Text="{Binding SnakeSpeed, Mode=OneWay}" />
+					   Grid.Column="1">
+				<Run Text="Speed:" />
+				<Run Text="{Binding Options.SnakeSpeed, Mode=OneWay}" />
 			</TextBlock>
 		</Grid>
 
-		<TextBlock x:Name="TopTextTitle"
+		<TextBlock x:Name="TxtTitle"
 				   Grid.Column="0"
 				   Text="Snake"
-				   Style="{StaticResource ResourceKey=TxtMenuPanelStyle}"
-				   Visibility="{Binding TopTextTitleVisibile, Converter={converters:BoolToVisibilityConverter}}" />
+				   Visibility="{Binding TopTextTitleVisible, Converter={converters:BoolToVisibilityConverter}}" />
 
-		<StackPanel Grid.Column="1"
-					Orientation="Horizontal"
-					HorizontalAlignment="Right"
-					VerticalAlignment="Top"
-					Background="Black">
+		<StackPanel x:Name="PanelWindowState"
+					Grid.Column="1"
+					Style="{StaticResource StackPanelStyle}">
 
 			<Button x:Name="BtnMinimize"
 					Content="__"
-					Style="{StaticResource ResourceKey=BtnMinimizeStyle}"
+					Style="{StaticResource BtnMinimizeStyle}"
 					Command="{Binding MinimizeWindowCommand}"
 					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
 
 			<Button x:Name="BtnClose"
 					Content="X"
-					Style="{StaticResource ResourceKey=BtnCloseStyle}"
-					Command="{Binding CloseWindowCommand}"
-					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+					Style="{StaticResource BtnCloseStyle}">
+
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<i:CallMethodAction MethodName="Close"
+											TargetObject="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</Button>
 		</StackPanel>
 	</Grid>
 </UserControl>

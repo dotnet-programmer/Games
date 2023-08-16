@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Snake.WpfApp.Commands;
 using Snake.WpfApp.Models;
@@ -16,15 +15,14 @@ namespace Snake.WpfApp.ViewModels;
 
 internal class MainViewModel : BaseViewModel
 {
-	private const int SEGMENT_SIZE = 20;
-
 	private readonly Random _random = new();
-	private readonly MediaPlayer _mediaPlayer = new();
+	private readonly MusicHelper _music = new();
 	private readonly DispatcherTimer _gameTimer = new();
 	private readonly LinkedList<MoveDirection> _directionChanges = new();
-	private readonly static string _pathToSnakeFolder = Path.Combine(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%"), "Snake");
+	private static readonly string _pathToSnakeFolder = Path.Combine(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%"), "Snake");
 	private readonly FileHelper<List<HighScore>> _fileHighScore = new(Path.Combine(_pathToSnakeFolder, "HighScores.json"));
-	private readonly FileHelper<Options> _fileOptions = new(Path.Combine(_pathToSnakeFolder, "Options.json"));
+	private readonly FileHelper<OptionsViewModel> _fileOptions = new(Path.Combine(_pathToSnakeFolder, "Options.json"));
+
 	private readonly Dictionary<MoveDirection, int> _directionRotation = new()
 	{
 		{ MoveDirection.Up, 0 },
@@ -34,8 +32,6 @@ internal class MainViewModel : BaseViewModel
 	};
 
 	private MoveDirection _moveDirection;
-	private Options _options;
-	private int _gridColumns;
 
 	public MainViewModel()
 	{
@@ -45,13 +41,19 @@ internal class MainViewModel : BaseViewModel
 		SetWindowState();
 		Snake = new();
 		_gameTimer.Tick += GameTimer_Tick;
-		_mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
 	}
+
+	#region Property binding
 
 	/// <summary>
 	/// Flag to set game over status
 	/// </summary>
 	public bool IsGameOver { get; set; }
+
+	/// <summary>
+	/// Property that represents the game options
+	/// </summary>
+	public OptionsViewModel Options { get; set; }
 
 	/// <summary>
 	/// An observable collection that represents the snake on the screen
@@ -84,33 +86,53 @@ internal class MainViewModel : BaseViewModel
 	}
 
 	/// <summary>
+	/// Property that represents the player name
+	/// </summary>
+	private string _currentPlayerName;
+	public string CurrentPlayerName
+	{
+		get => _currentPlayerName;
+		set { _currentPlayerName = value; OnPropertyChanged(); }
+	}
+
+	/// <summary>
+	/// Property that stores the current score
+	/// </summary>
+	private int _currentScore;
+	public int CurrentScore
+	{
+		get => _currentScore;
+		set { _currentScore = value; OnPropertyChanged(); }
+	}
+
+	/// <summary>
 	/// Flag to set the visibility of the countdown text
 	/// </summary>
-	private bool _countdownVisibile;
-	public bool CountdownVisibile
+	private bool _countdownVisible;
+	public bool CountdownVisible
 	{
-		get => _countdownVisibile;
-		set { _countdownVisibile = value; OnPropertyChanged(); }
+		get => _countdownVisible;
+		set { _countdownVisible = value; OnPropertyChanged(); }
 	}
 
 	/// <summary>
 	/// Flag to set the visibility of the main menu
 	/// </summary>
-	private bool _mainMenuVisibile;
-	public bool MainMenuVisibile
+	private bool _mainMenuVisible;
+	public bool MainMenuVisible
 	{
-		get => _mainMenuVisibile;
-		set { _mainMenuVisibile = value; OnPropertyChanged(); }
+		get => _mainMenuVisible;
+		set { _mainMenuVisible = value; OnPropertyChanged(); }
 	}
 
 	/// <summary>
 	/// Flag to set the visibility of the main menu
 	/// </summary>
-	private bool _playGameVisibile;
-	public bool PlayGameVisibile
+	private bool _playGameVisible;
+	public bool PlayGameVisible
 	{
-		get => _playGameVisibile;
-		set { _playGameVisibile = value; OnPropertyChanged(); }
+		get => _playGameVisible;
+		set { _playGameVisible = value; OnPropertyChanged(); }
 	}
 
 	/// <summary>
@@ -146,88 +168,36 @@ internal class MainViewModel : BaseViewModel
 	/// <summary>
 	/// Flag to set the visibility of the game over menu
 	/// </summary>
-	private bool _gameOverMenuVisibile;
-	public bool GameOverMenuVisibile
+	private bool _gameOverMenuVisible;
+	public bool GameOverMenuVisible
 	{
-		get => _gameOverMenuVisibile;
-		set { _gameOverMenuVisibile = value; OnPropertyChanged(); }
+		get => _gameOverMenuVisible;
+		set { _gameOverMenuVisible = value; OnPropertyChanged(); }
 	}
 
 	/// <summary>
 	/// Flag to set the visibility of the text with window title
 	/// </summary>
-	private bool _topTextTitleVisibile;
-	public bool TopTextTitleVisibile
+	private bool _topTextTitleVisible;
+	public bool TopTextTitleVisible
 	{
-		get => _topTextTitleVisibile;
-		set { _topTextTitleVisibile = value; OnPropertyChanged(); }
+		get => _topTextTitleVisible;
+		set { _topTextTitleVisible = value; OnPropertyChanged(); }
 	}
 
 	/// <summary>
 	/// Flag to set the visibility of the text with actual score
 	/// </summary>
-	private bool _topTextScoreVisibile;
-	public bool TopTextScoreVisibile
+	private bool _topTextScoreVisible;
+	public bool TopTextScoreVisible
 	{
-		get => _topTextScoreVisibile;
-		set { _topTextScoreVisibile = value; OnPropertyChanged(); }
+		get => _topTextScoreVisible;
+		set { _topTextScoreVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Property that represents the player name
-	/// </summary>
-	private string _currentPlayerName;
-	public string CurrentPlayerName
-	{
-		get => _currentPlayerName;
-		set { _currentPlayerName = value; OnPropertyChanged(); }
-	}
+	#endregion Property binding
 
-	/// <summary>
-	/// Property that stores the current score
-	/// </summary>
-	private int _currentScore;
-	public int CurrentScore
-	{
-		get => _currentScore;
-		set { _currentScore = value; OnPropertyChanged(); }
-	}
-
-	/// <summary>
-	/// Property to set current snake speed
-	/// </summary>
-	public int SnakeSpeed
-	{
-		get => _options.SnakeSpeed;
-		set { _options.SnakeSpeed = value; OnPropertyChanged(); }
-	}
-
-	/// <summary>
-	/// Property to set current game grid size
-	/// </summary>
-	public int GameGridSize
-	{
-		get => _options.GameGridSize;
-		set { _options.GameGridSize = value; OnPropertyChanged(); }
-	}
-
-	/// <summary>
-	/// Property to set current sound volume
-	/// </summary>
-	public double SoundVolume
-	{
-		get => _options.SoundVolume;
-		set { _options.SoundVolume = value; OnPropertyChanged(); }
-	}
-
-	/// <summary>
-	/// Property to set playfield border
-	/// </summary>
-	public bool IsFieldHaveBorder
-	{
-		get => _options.IsFieldHaveBorder;
-		set { _options.IsFieldHaveBorder = value; OnPropertyChanged(); }
-	}
+	#region Commands
 
 	public ICommand StartNewGameCommand { get; private set; }
 	public ICommand ShowMainMenuCommand { get; private set; }
@@ -243,9 +213,9 @@ internal class MainViewModel : BaseViewModel
 	public ICommand SaveOptionsCommand { get; private set; }
 	public ICommand GameOverCommand { get; private set; }
 	public ICommand ChangeSnakeDirectionCommand { get; private set; }
-	public ICommand WindowMouseDownCommand { get; private set; }
 	public ICommand MinimizeWindowCommand { get; private set; }
-	public ICommand CloseWindowCommand { get; private set; }
+
+	#endregion Commands
 
 	private void SetCommands()
 	{
@@ -263,132 +233,31 @@ internal class MainViewModel : BaseViewModel
 		SaveOptionsCommand = new RelayCommand(SaveOptions);
 		GameOverCommand = new RelayCommand(GameOver);
 		ChangeSnakeDirectionCommand = new RelayCommand(ChangeSnakeDirection);
-		WindowMouseDownCommand = new RelayCommand(WindowMouseDown);
 		MinimizeWindowCommand = new RelayCommand(MinimizeWindow);
-		CloseWindowCommand = new RelayCommand(CloseWindow);
 	}
 
-	private void SetTimerInterval()
-	{
-		var interval = (10 - SnakeSpeed) * 100 / 3;
-		_gameTimer.Interval = TimeSpan.FromMilliseconds(interval);
-	}
-
-	private void SetWindowState()
-	{
-		PlayMusic("menu");
-		ShowMainMenuPanel();
-		SetGridColumns();
-	}
-
-	private void MediaPlayer_MediaEnded(object? sender, EventArgs e) => _mediaPlayer.Position = TimeSpan.Zero;
-
-	private void ReadOptions()
-	{
-		_options = _fileOptions.DeserializeFromJSON();
-		if (_options.SnakeSpeed == 0)
-		{
-			_options.SnakeSpeed = 1;
-			_options.GameGridSize = 600;
-			_options.SoundVolume = 0.5;
-			_options.IsFieldHaveBorder = false;
-		}
-		_mediaPlayer.Volume = SoundVolume;
-	}
-
-	private void ReadHighScores() => HighScoreList = new(_fileHighScore.DeserializeFromJSON());
-
-	private void SaveHighScores() => _fileHighScore.SerializeToJSON(HighScoreList.ToList());
-
-	private async Task StartNewGameAsync(object obj)
+	private async Task StartNewGameAsync(object commandParameter)
 	{
 		SetTimerInterval();
 		SetGameState();
 		SetNewSnake();
 		MakeNewFood();
 		ShowPlayGamePanel();
+		_music.PlayMusic(MusicKind.Game);
 		await ShowCountDown();
 		_gameTimer.Start();
 	}
 
-	private async Task ShowCountDown()
-	{
-		CountdownVisibile = true;
-		for (int i = 3; i > 0; i--)
-		{
-			CountdownText = i.ToString();
-			await Task.Delay(600);
-		}
-		CountdownVisibile = false;
-	}
+	private void ShowMainMenu(object commandParameter) => ShowMainMenuPanel();
 
-	private void SetGameState()
-	{
-		IsGameOver = false;
-		CurrentScore = 0;
-		_directionChanges.Clear();
-		_moveDirection = MoveDirection.Right;
-	}
+	private void ShowHighScores(object commandParameter) => ShowHighScoresPanel();
 
-	private void SetNewSnake()
-	{
-		int startPos = GameGridSize / 2 - SEGMENT_SIZE;
-		Snake.Clear();
-		Snake.Add(new SegmentViewModel(startPos, startPos, SegmentKind.Head));
-		Snake.Add(new SegmentViewModel(startPos - SEGMENT_SIZE, startPos, SegmentKind.Body));
-		Snake.Add(new SegmentViewModel(startPos - 2 * SEGMENT_SIZE, startPos, SegmentKind.Tail));
-	}
-
-	private void ShowPlayGamePanel()
-	{
-		PlayGameVisibile = TopTextScoreVisibile = true;
-		MainMenuVisibile = GameOverMenuVisibile = TopTextTitleVisibile = false;
-		PlayMusic("game");
-	}
-
-	private void ShowHighScoresPanel()
-	{
-		HighScoresVisible = TopTextTitleVisibile = true;
-		GameOverMenuVisibile = MainMenuVisibile = NewHighScoreVisible = false;
-	}
-
-	private void ShowNewHighScorePanel()
-	{
-		NewHighScoreVisible = TopTextTitleVisibile = true;
-		PlayGameVisibile = TopTextScoreVisibile = false;
-		PlayMusic("menu");
-	}
-
-	private void ShowOptionsMenuPanel()
-	{
-		OptionsMenuVisible = true;
-		MainMenuVisibile = false;
-	}
-
-	private void ShowMainMenuPanel()
-	{
-		MainMenuVisibile = TopTextTitleVisibile = true;
-		GameOverMenuVisibile = OptionsMenuVisible = HighScoresVisible = false;
-	}
-
-	private void ShowGameOverPanel()
-	{
-		GameOverMenuVisibile = TopTextTitleVisibile = true;
-		PlayGameVisibile = TopTextScoreVisibile = false;
-		PlayMusic("menu");
-	}
-
-	private void ShowMainMenu(object obj) => ShowMainMenuPanel();
-
-	private void ShowHighScores(object obj) => ShowHighScoresPanel();
-
-	private void SaveNewHighScore(object obj)
+	private void SaveNewHighScore(object commandParameter)
 	{
 		int index = 0;
 		if (HighScoreList.Any())
 		{
-			var test = HighScoreList.First(x => x.Score <= CurrentScore);
-			index = HighScoreList.IndexOf(test);
+			index = HighScoreList.IndexOf(HighScoreList.First(x => x.Score <= CurrentScore));
 		}
 		if (string.IsNullOrWhiteSpace(CurrentPlayerName))
 		{
@@ -403,103 +272,114 @@ internal class MainViewModel : BaseViewModel
 		ShowHighScoresPanel();
 	}
 
-	private void ShowOptions(object obj) => ShowOptionsMenuPanel();
+	private void ShowOptions(object commandParameter) => ShowOptionsMenuPanel();
 
-	private void IncreaseSnakeSpeed(object obj)
-	{
-		if (SnakeSpeed < 9)
-		{
-			SnakeSpeed++;
-		}
-	}
+	private void IncreaseSnakeSpeed(object commandParameter) => Options.SnakeSpeed++;
 
-	private void DecreaseSnakeSpeed(object obj)
-	{
-		if (SnakeSpeed > 1)
-		{
-			SnakeSpeed--;
-		}
-	}
+	private void DecreaseSnakeSpeed(object commandParameter) => Options.SnakeSpeed--;
 
-	private void IncreaseGameGridSize(object obj)
+	private void IncreaseGameGridSize(object commandParameter)
 	{
-		if (GameGridSize < 1000)
+		if (Options.GameGridSize < 1000)
 		{
-			GameGridSize += 200;
-			Window window = obj as Window;
+			Options.GameGridSize += 200;
+			Window window = commandParameter as Window;
 			window.Left = window.Left - 100;
 			window.Top = window.Top - 100;
-			SetGridColumns();
 		}
 	}
 
-	private void DecreaseGameGridSize(object obj)
+	private void DecreaseGameGridSize(object commandParameter)
 	{
-		if (GameGridSize > 400)
+		if (Options.GameGridSize > 400)
 		{
-			GameGridSize -= 200;
-			Window window = obj as Window;
+			Options.GameGridSize -= 200;
+			Window window = commandParameter as Window;
 			window.Left = window.Left + 100;
 			window.Top = window.Top + 100;
-			SetGridColumns();
 		}
 	}
 
-	private void IncreaseSoundVolume(object obj)
-	{
-		if (_mediaPlayer.Volume < 1)
-		{
-			SoundVolume += 0.1;
-			SoundVolume = Math.Round(SoundVolume, 1);
-			_mediaPlayer.Volume = SoundVolume;
-		}
-	}
+	private void IncreaseSoundVolume(object commandParameter) => _music.SetVolume(Options.SoundVolume++);
 
-	private void DecreaseSoundVolume(object obj)
-	{
-		if (_mediaPlayer.Volume > 0)
-		{
-			SoundVolume -= 0.1;
-			SoundVolume = Math.Round(SoundVolume, 1);
-			_mediaPlayer.Volume = SoundVolume;
-		}
-	}
+	private void DecreaseSoundVolume(object commandParameter) => _music.SetVolume(Options.SoundVolume--);
 
-	private void SaveOptions(object obj)
+	private void SaveOptions(object commandParameter)
 	{
-		_fileOptions.SerializeToJSON(_options);
+		_fileOptions.SerializeToJSON(Options);
 		ShowMainMenuPanel();
 	}
 
-	private void GameOver(object obj) => IsGameOver = true;
+	private void GameOver(object commandParameter) => IsGameOver = true;
 
-	private void ChangeSnakeDirection(object obj)
+	private void ChangeSnakeDirection(object commandParameter)
 	{
 		if (IsGameOver)
 		{
 			return;
 		}
 
-		if (obj is Key key)
+		if (commandParameter is Key key)
 		{
-			switch (key)
+			MoveDirection moveDirection = key switch
 			{
-				case Key.Up:
-					ChangeDirection(MoveDirection.Up);
-					break;
-				case Key.Down:
-					ChangeDirection(MoveDirection.Down);
-					break;
-				case Key.Left:
-					ChangeDirection(MoveDirection.Left);
-					break;
-				case Key.Right:
-					ChangeDirection(MoveDirection.Right);
-					break;
-				default:
-					break;
-			}
+				Key.Up => MoveDirection.Up,
+				Key.Down => MoveDirection.Down,
+				Key.Left => MoveDirection.Left,
+				Key.Right => MoveDirection.Right
+			};
+			ChangeDirection(moveDirection);
 		}
+	}
+
+	private void SetTimerInterval()
+	{
+		var interval = (10 - Options.SnakeSpeed) * 100 / 3;
+		_gameTimer.Interval = TimeSpan.FromMilliseconds(interval);
+	}
+
+	private void SetWindowState()
+	{
+		_music.PlayMusic(MusicKind.Menu);
+		ShowMainMenuPanel();
+	}
+
+	private void ReadOptions()
+	{
+		Options = _fileOptions.DeserializeFromJSON();
+		_music.SetVolume(Options.SoundVolume);
+	}
+
+	private void ReadHighScores() => HighScoreList = new(_fileHighScore.DeserializeFromJSON());
+
+	private void SaveHighScores() => _fileHighScore.SerializeToJSON(HighScoreList.ToList());
+
+	private async Task ShowCountDown()
+	{
+		CountdownVisible = true;
+		for (int i = 3; i > 0; i--)
+		{
+			CountdownText = i.ToString();
+			await Task.Delay(600);
+		}
+		CountdownVisible = false;
+	}
+
+	private void SetGameState()
+	{
+		IsGameOver = false;
+		CurrentScore = 0;
+		_directionChanges.Clear();
+		_moveDirection = MoveDirection.Right;
+	}
+
+	private void SetNewSnake()
+	{
+		int startPos = Options.GameGridSize / 2 - Options.SegmentSize;
+		Snake.Clear();
+		Snake.Add(new SegmentViewModel(startPos, startPos, Options.SegmentSize, SegmentKind.Head));
+		Snake.Add(new SegmentViewModel(startPos - Options.SegmentSize, startPos, Options.SegmentSize, SegmentKind.Body));
+		Snake.Add(new SegmentViewModel(startPos - 2 * Options.SegmentSize, startPos, Options.SegmentSize, SegmentKind.Tail));
 	}
 
 	private void ChangeDirection(MoveDirection direction)
@@ -549,6 +429,8 @@ internal class MainViewModel : BaseViewModel
 				ShowGameOverPanel();
 			}
 
+			_music.PlayMusic(MusicKind.Menu);
+
 			return;
 		}
 
@@ -578,11 +460,11 @@ internal class MainViewModel : BaseViewModel
 		bool isSnakeSegment = false;
 		do
 		{
-			xPos = _random.Next(_gridColumns) * SEGMENT_SIZE;
-			yPos = _random.Next(_gridColumns) * SEGMENT_SIZE;
+			xPos = _random.Next(Options.GridColumns) * Options.SegmentSize;
+			yPos = _random.Next(Options.GridColumns) * Options.SegmentSize;
 			isSnakeSegment = Snake.FirstOrDefault(s => s.XPos == xPos && s.YPos == yPos) != null;
 		} while (isSnakeSegment);
-		Food = new SegmentViewModel(xPos, yPos, SegmentKind.Food);
+		Food = new SegmentViewModel(xPos, yPos, Options.SegmentSize, SegmentKind.Food);
 	}
 
 	private void MoveSnake()
@@ -597,11 +479,11 @@ internal class MainViewModel : BaseViewModel
 		}
 
 		Snake.First().ImageSource = Images.Body;
-		Snake.Insert(0, new SegmentViewModel(newXPos, newYPos, SegmentKind.Head) { Rotation = _directionRotation[_moveDirection] });
+		Snake.Insert(0, new SegmentViewModel(newXPos, newYPos, Options.SegmentSize, SegmentKind.Head) { Rotation = _directionRotation[_moveDirection] });
 
 		if (newXPos == Food.XPos && newYPos == Food.YPos)
 		{
-			CurrentScore += SnakeSpeed;
+			CurrentScore += Options.SnakeSpeed;
 			MakeNewFood();
 		}
 		else
@@ -629,22 +511,22 @@ internal class MainViewModel : BaseViewModel
 		switch (_moveDirection)
 		{
 			case MoveDirection.Left:
-				xPos -= SEGMENT_SIZE;
+				xPos -= Options.SegmentSize;
 				break;
 			case MoveDirection.Right:
-				xPos += SEGMENT_SIZE;
+				xPos += Options.SegmentSize;
 				break;
 			case MoveDirection.Up:
-				yPos -= SEGMENT_SIZE;
+				yPos -= Options.SegmentSize;
 				break;
 			case MoveDirection.Down:
-				yPos += SEGMENT_SIZE;
+				yPos += Options.SegmentSize;
 				break;
 		}
 
-		if (!IsFieldHaveBorder)
+		if (!Options.IsFieldHaveBorder)
 		{
-			int maxGameGridSize = GameGridSize - SEGMENT_SIZE;
+			int maxGameGridSize = Options.GameGridSize - Options.SegmentSize;
 			if (xPos < 0)
 			{
 				xPos = maxGameGridSize;
@@ -678,9 +560,9 @@ internal class MainViewModel : BaseViewModel
 			}
 		}
 
-		if (IsFieldHaveBorder)
+		if (Options.IsFieldHaveBorder)
 		{
-			if (xPos < 0 || xPos >= GameGridSize || yPos < 0 || yPos >= GameGridSize)
+			if (xPos < 0 || xPos >= Options.GameGridSize || yPos < 0 || yPos >= Options.GameGridSize)
 			{
 				IsGameOver = true;
 				return;
@@ -688,17 +570,45 @@ internal class MainViewModel : BaseViewModel
 		}
 	}
 
-	private void SetGridColumns() => _gridColumns = (GameGridSize / SEGMENT_SIZE);
+	private void MinimizeWindow(object commandParameter) => (commandParameter as Window).WindowState = WindowState.Minimized;
 
-	private void PlayMusic(string fileName)
+	#region Show/Hide Panels
+
+	private void ShowPlayGamePanel()
 	{
-		_mediaPlayer.Open(new Uri($"Sounds/{fileName}.wav", UriKind.Relative));
-		_mediaPlayer.Play();
+		PlayGameVisible = TopTextScoreVisible = true;
+		MainMenuVisible = GameOverMenuVisible = TopTextTitleVisible = false;
 	}
 
-	private void WindowMouseDown(object obj) => (obj as Window).DragMove();
+	private void ShowHighScoresPanel()
+	{
+		HighScoresVisible = TopTextTitleVisible = true;
+		GameOverMenuVisible = MainMenuVisible = NewHighScoreVisible = false;
+	}
 
-	private void MinimizeWindow(object obj) => (obj as Window).WindowState = WindowState.Minimized;
+	private void ShowNewHighScorePanel()
+	{
+		NewHighScoreVisible = TopTextTitleVisible = true;
+		PlayGameVisible = TopTextScoreVisible = false;
+	}
 
-	private void CloseWindow(object obj) => (obj as Window).Close();
+	private void ShowOptionsMenuPanel()
+	{
+		OptionsMenuVisible = true;
+		MainMenuVisible = false;
+	}
+
+	private void ShowMainMenuPanel()
+	{
+		MainMenuVisible = TopTextTitleVisible = true;
+		GameOverMenuVisible = OptionsMenuVisible = HighScoresVisible = false;
+	}
+
+	private void ShowGameOverPanel()
+	{
+		GameOverMenuVisible = TopTextTitleVisible = true;
+		PlayGameVisible = TopTextScoreVisible = false;
+	}
+
+	#endregion Show/Hide Panels
 }

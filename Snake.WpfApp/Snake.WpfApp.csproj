@@ -18,6 +18,8 @@
     <None Remove="Resources\Images\Head.png" />
     <None Remove="Resources\Images\icon.ico" />
     <None Remove="Resources\Images\Tail.png" />
+    <None Remove="Resources\Sounds\game.wav" />
+    <None Remove="Resources\Sounds\menu.wav" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +37,12 @@
     <Resource Include="Resources\Images\Head.png" />
     <Resource Include="Resources\Images\icon.ico" />
     <Resource Include="Resources\Images\Tail.png" />
+    <Content Include="Resources\Sounds\game.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Sounds\menu.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
