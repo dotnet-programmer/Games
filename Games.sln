@@ -5,7 +5,9 @@ VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invaders.WinFormsApp", "Invaders.WinFormsApp\Invaders.WinFormsApp.csproj", "{A2BDD30F-B9A7-485D-AC8E-F40B86174A05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snake.WpfApp", "Snake.WpfApp\Snake.WpfApp.csproj", "{EE05A238-498A-4546-AFBA-9034E868E89A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snake.WpfApp", "Snake.WpfApp\Snake.WpfApp.csproj", "{EE05A238-498A-4546-AFBA-9034E868E89A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tetris.WinForms", "Tetris.WinFormsApp\Tetris.WinForms.csproj", "{0E475F1F-96FD-4595-9671-C592E65DA437}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EE05A238-498A-4546-AFBA-9034E868E89A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE05A238-498A-4546-AFBA-9034E868E89A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE05A238-498A-4546-AFBA-9034E868E89A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E475F1F-96FD-4595-9671-C592E65DA437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E475F1F-96FD-4595-9671-C592E65DA437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E475F1F-96FD-4595-9671-C592E65DA437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E475F1F-96FD-4595-9671-C592E65DA437}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
