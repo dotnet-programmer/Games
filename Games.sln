@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snake.WpfApp", "Snake.WpfAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tetris.WinForms", "Tetris.WinFormsApp\Tetris.WinForms.csproj", "{0E475F1F-96FD-4595-9671-C592E65DA437}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemoryGame.WpfApp", "MemoryGame.WpfApp\MemoryGame.WpfApp.csproj", "{2AA21853-5147-4BB1-9EB7-3AA078675777}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoguelikeGame.ConsoleApp", "RoguelikeGame.ConsoleApp\RoguelikeGame.ConsoleApp.csproj", "{D1D06D18-3372-4014-B1A7-2DD7898D7D92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{0E475F1F-96FD-4595-9671-C592E65DA437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E475F1F-96FD-4595-9671-C592E65DA437}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E475F1F-96FD-4595-9671-C592E65DA437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA21853-5147-4BB1-9EB7-3AA078675777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA21853-5147-4BB1-9EB7-3AA078675777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA21853-5147-4BB1-9EB7-3AA078675777}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA21853-5147-4BB1-9EB7-3AA078675777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D06D18-3372-4014-B1A7-2DD7898D7D92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D06D18-3372-4014-B1A7-2DD7898D7D92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D06D18-3372-4014-B1A7-2DD7898D7D92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D06D18-3372-4014-B1A7-2DD7898D7D92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
