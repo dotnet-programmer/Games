@@ -2,20 +2,7 @@
 
 internal class Scroll
 {
-	/*
-		https://ascii.co.uk/art/scroll
-			 _______________
-		()==(              (@==()
-			 '______________'|
-			   |             |
-			   |             |
-			 __)_____________|
-		()==(               (@==()
-			 '--------------'
-						   PjP
-	*/
-
-	public static string[] MapScroll =>
+	private readonly string[] _scroll =
 	[
 		"     _______________",
 		"()==(              (@==()",
@@ -26,4 +13,23 @@ internal class Scroll
 		"()==(               (@==()",
 		"     '--------------'    ",
 	];
+
+	public int Length
+		=> _scroll.Length;
+
+	public string this[int index]
+		=> _scroll[index];
 }
+
+/*
+	https://ascii.co.uk/art/scroll
+		 _______________
+	()==(              (@==()
+		 '______________'|
+		   |             |
+		   |             |
+		 __)_____________|
+	()==(               (@==()
+		 '--------------'
+					   PjP
+*/
