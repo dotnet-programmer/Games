@@ -1,11 +1,11 @@
 ﻿namespace RoguelikeGame.ConsoleApp;
 
-internal class Player(int x, int y, string avatar)
+internal class Player(int x, int y, char sign)
 {
-	public string? Name { get; set; }
-	public string? Place { get; set; }
+	public string Name { get; set; } = default!;
+	public string Place { get; set; } = default!;
 
 	public int X { get; set; } = x;
 	public int Y { get; set; } = y;
-	public string Avatar { get; } = avatar;
+	public char Sign { get; } = sign;
 }
