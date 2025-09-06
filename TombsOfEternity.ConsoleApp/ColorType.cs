@@ -1,4 +1,4 @@
-﻿namespace RoguelikeGame.ConsoleApp;
+﻿namespace TombsOfEternity.ConsoleApp;
 
 public enum ColorType
 {

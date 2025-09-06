@@ -1,4 +1,4 @@
-﻿namespace RoguelikeGame.ConsoleApp;
+﻿namespace TombsOfEternity.ConsoleApp;
 
 internal class ExitConnection(int exitLevel, int exitNumber, int entryLevel, int entryNumber)
 {

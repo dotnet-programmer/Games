@@ -1,4 +1,4 @@
-﻿namespace RoguelikeGame.ConsoleApp;
+﻿namespace TombsOfEternity.ConsoleApp;
 
 internal class Game
 {
@@ -69,7 +69,7 @@ internal class Game
 	{
 		Console.WriteLine();
 		Console.WriteLine();
-		await ExpandText("Welcome to Roguelike Game, ", addNewLine: false);
+		await ExpandText("Welcome to Tombs Of Eternity, ", addNewLine: false);
 		await ExpandText(_player.Name, ColorType.Secondary, false);
 		await ExpandText(" from ", addNewLine: false);
 		await ExpandText(_player.Place, ColorType.Secondary, false);

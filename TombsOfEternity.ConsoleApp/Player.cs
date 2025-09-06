@@ -1,4 +1,4 @@
-﻿namespace RoguelikeGame.ConsoleApp;
+﻿namespace TombsOfEternity.ConsoleApp;
 
 internal class Player(int x, int y, char sign)
 {

@@ -1,7 +1,7 @@
-﻿using RoguelikeGame.ConsoleApp;
+﻿using TombsOfEternity.ConsoleApp;
 
 Console.CursorVisible = false;
-Console.Title = "Rougelike game";
+Console.Title = "Tombs Of Eternity";
 
 Game game = new();
 await game.StartAsync();
