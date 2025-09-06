@@ -1,4 +1,4 @@
-﻿namespace TombsOfEternity.ConsoleApp;
+﻿namespace TombsOfEternity.ConsoleApp.Enums;
 
 public enum ColorType
 {

@@ -1,4 +1,6 @@
-﻿namespace TombsOfEternity.ConsoleApp;
+﻿using TombsOfEternity.ConsoleApp.Enums;
+
+namespace TombsOfEternity.ConsoleApp;
 
 internal class Game
 {
@@ -11,8 +13,8 @@ internal class Game
 
 	internal async Task StartAsync()
 	{
-		await CreateNewPlayer();
-		await ShowWelcomeMessage();
+		await CreateNewPlayerAsync();
+		await ShowWelcomeMessageAsync();
 		await PlayIntroAsync();
 
 		if (_isGameOver)
@@ -23,73 +25,73 @@ internal class Game
 		await PlayGameAsync();
 	}
 
-	private async Task CreateNewPlayer()
+	private async Task CreateNewPlayerAsync()
 	{
 		_player = new(1, 1, '@');
-		await SetPlayerName();
-		await SetPlayerPlace();
+		await SetPlayerNameAsync();
+		await SetPlayerPlaceAsync();
 	}
 
-	private async Task SetPlayerName()
+	private async Task SetPlayerNameAsync()
 	{
-		await ExpandText("Who are you, Stranger?");
+		await ExpandTextAsync("Who are you, Stranger?");
 		string? name = GetInput();
 
 		if (string.IsNullOrWhiteSpace(name))
 		{
-			await ExpandText("I will still call you Stranger, then.");
+			await ExpandTextAsync("I will still call you Stranger, then.");
 			name = "Stranger";
 		}
 		else if (name.ToLower() == "stranger")
 		{
-			await ExpandText("Ha! I knew it!");
+			await ExpandTextAsync("Ha! I knew it!");
 		}
 
 		_player.Name = name;
 	}
 
-	private async Task SetPlayerPlace()
+	private async Task SetPlayerPlaceAsync()
 	{
 		Console.WriteLine();
-		await ExpandText("Where are you from, ", addNewLine: false);
-		await ExpandText(_player.Name, ColorType.Secondary, false);
-		await ExpandText("?");
+		await ExpandTextAsync("Where are you from, ", addNewLine: false);
+		await ExpandTextAsync(_player.Name, ColorType.Secondary, false);
+		await ExpandTextAsync("?");
 		string? place = GetInput();
 
 		if (string.IsNullOrWhiteSpace(place))
 		{
-			await ExpandText("You are not too talkative, are you?");
+			await ExpandTextAsync("You are not too talkative, are you?");
 			place = "Nowhere";
 		}
 
 		_player.Place = place;
 	}
 
-	private async Task ShowWelcomeMessage()
+	private async Task ShowWelcomeMessageAsync()
 	{
 		Console.WriteLine();
 		Console.WriteLine();
-		await ExpandText("Welcome to Tombs Of Eternity, ", addNewLine: false);
-		await ExpandText(_player.Name, ColorType.Secondary, false);
-		await ExpandText(" from ", addNewLine: false);
-		await ExpandText(_player.Place, ColorType.Secondary, false);
-		await ExpandText(".");
+		await ExpandTextAsync("Welcome to Tombs Of Eternity, ", addNewLine: false);
+		await ExpandTextAsync(_player.Name, ColorType.Secondary, false);
+		await ExpandTextAsync(" from ", addNewLine: false);
+		await ExpandTextAsync(_player.Place, ColorType.Secondary, false);
+		await ExpandTextAsync(".");
 		Console.WriteLine();
-		await ExpandText("Press any key to enter the dungeon and begin your adventure!");
+		await ExpandTextAsync("Press any key to enter the dungeon and begin your adventure!");
 		ReadKey();
 	}
 
 	private async Task PlayIntroAsync()
 	{
 		ClearConsole();
-		await ExpandText("You are in a dark cave, deep underground.", delay: 1000);
-		await ExpandText("You walk slowly and carefully, but the echo of your steps carries far into the depths.", delay: 1000);
-		await ExpandText("Every now and then, a strange, ominous growl reaches your ears.", delay: 1000);
-		await ExpandText("You have reached the place where the cave split into 3 corridors.", delay: 1000);
-		await ExpandText("In the faint light of the torch, on the side wall, you noticed a narrow passageway.", delay: 1000);
-		await ExpandText("You walked closer to check it out and spotted an object!", delay: 1000);
-		await ExpandText("Unfortunately, it lies too far away to reach it with your hand.", delay: 1000);
-		await ExpandText("Do you want to take a chance and squeeze through the gap to pick it up? (Yes/No): ");
+		await ExpandTextAsync("You are in a dark cave, deep underground.", delay: 1000);
+		await ExpandTextAsync("You walk slowly and carefully, but the echo of your steps carries far into the depths.", delay: 1000);
+		await ExpandTextAsync("Every now and then, a strange, ominous growl reaches your ears.", delay: 1000);
+		await ExpandTextAsync("You have reached the place where the cave split into 3 corridors.", delay: 1000);
+		await ExpandTextAsync("In the faint light of the torch, on the side wall, you noticed a narrow passageway.", delay: 1000);
+		await ExpandTextAsync("You walked closer to check it out and spotted an object!", delay: 1000);
+		await ExpandTextAsync("Unfortunately, it lies too far away to reach it with your hand.", delay: 1000);
+		await ExpandTextAsync("Do you want to take a chance and squeeze through the gap to pick it up? (Yes/No): ");
 
 		string choice;
 		do
@@ -99,34 +101,34 @@ internal class Game
 
 		if (choice is "Y" or "YES")
 		{
-			await ExpandText("It was hard and you almost got stuck, but you made it!", delay: 1000);
-			await ExpandText("To your eyes appeared an ancient scroll that looked like this:", delay: 1000);
+			await ExpandTextAsync("It was hard and you almost got stuck, but you made it!", delay: 1000);
+			await ExpandTextAsync("To your eyes appeared an ancient scroll that looked like this:", delay: 1000);
 			await ShowScrollAsync();
-			await ExpandText("Bravo! You have acquired a magical map of the underworld that will lead you to the hidden treasure!", delay: 1000);
+			await ExpandTextAsync("Bravo! You have acquired a magical map of the underworld that will lead you to the hidden treasure!", delay: 1000);
 			_isGameOver = false;
 		}
 		else
 		{
-			await ExpandText("You trusted your intuition and moved on, choosing the first corridor.", delay: 1000);
-			await ExpandText("The road was winding, leading constantly downward, and the disturbing murmur grew more and more intense.", delay: 1000);
-			await ExpandText("After a long trek, you reached a huge underground lake!", delay: 1000);
-			await ExpandText("You feel a penetrating chill, and a moment later a sudden gust of icy wind extinguish the torch.", delay: 1000);
-			await ExpandText("Total darkness fell....", delay: 1000);
-			await ExpandText("Something stirred the water....", delay: 1000);
-			await ExpandText("You hear a quiet, steady clatter coming towards you!", delay: 1000);
-			await ExpandText("You start to run away running blindly but hit a wall and fall over.", delay: 1000);
-			await ExpandText("Before you could get up, the slimy tentacles of the monster managed to clamp down on your neck....", delay: 3000);
+			await ExpandTextAsync("You trusted your intuition and moved on, choosing the first corridor.", delay: 1000);
+			await ExpandTextAsync("The road was winding, leading constantly downward, and the disturbing murmur grew more and more intense.", delay: 1000);
+			await ExpandTextAsync("After a long trek, you reached a huge underground lake!", delay: 1000);
+			await ExpandTextAsync("You feel a penetrating chill, and a moment later a sudden gust of icy wind extinguish the torch.", delay: 1000);
+			await ExpandTextAsync("Total darkness fell....", delay: 1000);
+			await ExpandTextAsync("Something stirred the water....", delay: 1000);
+			await ExpandTextAsync("You hear a quiet, steady clatter coming towards you!", delay: 1000);
+			await ExpandTextAsync("You start to run away running blindly but hit a wall and fall over.", delay: 1000);
+			await ExpandTextAsync("Before you could get up, the slimy tentacles of the monster managed to clamp down on your neck....", delay: 3000);
 			Console.WriteLine();
-			await ExpandText("Crack!", ColorType.GameOver, delay: 3000);
+			await ExpandTextAsync("Crack!", ColorType.GameOver, delay: 3000);
 			Console.WriteLine();
-			await ExpandText("GAME OVER!", ColorType.GameOver);
+			await ExpandTextAsync("GAME OVER!", ColorType.GameOver);
 			_isGameOver = true;
 		}
 
 		ReadKey();
 	}
 
-	private async Task ExpandText(string text, ColorType colorType = ColorType.Primary, bool addNewLine = true, int delay = 0)
+	private async Task ExpandTextAsync(string text, ColorType colorType = ColorType.Primary, bool addNewLine = true, int delay = 0)
 	{
 		switch (colorType)
 		{
@@ -144,9 +146,9 @@ internal class Game
 				break;
 		}
 
-		for (int i = 0; i < text.Length; i++)
+		foreach (var letter in text)
 		{
-			Console.Write($"{text[i]}");
+			Console.Write(letter);
 			await Task.Delay(40);
 		}
 
@@ -309,8 +311,14 @@ internal class Game
 		=> Console.Clear();
 
 	private void WritePlayerPosition()
-		=> Display.WriteAt(_player.X, _player.Y, _player.Sign);
+		=> WriteAt(_player.X, _player.Y, _player.Sign);
 
 	private void WriteFloorUnderPlayer()
-		=> Display.WriteAt(_player.X, _player.Y, _map.GetMap[_player.Y][_player.X]);
+		=> WriteAt(_player.X, _player.Y, _map.GetMap[_player.Y][_player.X]);
+
+	private void WriteAt(int columnNumber, int rowNumber, char sign)
+	{
+		Console.SetCursorPosition(columnNumber, rowNumber);
+		Console.Write(sign);
+	}
 }
