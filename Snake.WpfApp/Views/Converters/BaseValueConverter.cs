@@ -20,7 +20,8 @@ internal abstract class BaseValueConverter<T> : MarkupExtension, IValueConverter
 	/// </summary>
 	/// <param name="serviceProvider"></param>
 	/// <returns></returns>
-	public override object ProvideValue(IServiceProvider serviceProvider) => _converter ?? (_converter = new T());
+	public override object ProvideValue(IServiceProvider serviceProvider)
+		=> _converter ?? (_converter = new T());
 
 	#endregion MarkupExtension Members
 

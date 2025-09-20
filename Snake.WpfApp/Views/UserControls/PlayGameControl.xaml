@@ -13,6 +13,10 @@
 
 	<Grid x:Name="GameGrid">
 
+		<Grid.Background>
+			<ImageBrush ImageSource="../../Resources/Images/Background.jpg" />
+		</Grid.Background>
+
 		<Canvas x:Name="FoodDrawing"
 				Background="Transparent"
 				DataContext="{Binding Food}"
@@ -27,14 +31,29 @@
 		</Canvas>
 
 		<Border x:Name="SnakeDrawing">
+			<Border.Style>
+				<Style TargetType="Border">
+					<Setter Property="BorderThickness"
+							Value="0" />
+					<Setter Property="BorderBrush"
+							Value="Transparent" />
+
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Options.IsFieldHaveBorder}"
+									 Value="True">
+							<Setter Property="BorderThickness"
+									Value="3" />
+							<Setter Property="BorderBrush"
+									Value="Red" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Border.Style>
+
 			<ItemsControl ItemsSource="{Binding Snake}">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<Canvas ClipToBounds="True">
-							<Canvas.Background>
-								<ImageBrush ImageSource="../../Resources/Images/Background.jpg" />
-							</Canvas.Background>
-						</Canvas>
+						<Canvas ClipToBounds="True" />
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 

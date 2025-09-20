@@ -15,11 +15,12 @@ namespace Snake.WpfApp.ViewModels;
 
 internal class MainViewModel : BaseViewModel
 {
+	private static readonly string _pathToSnakeFolder = Path.Combine(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%"), "Snake");
+
 	private readonly Random _random = new();
 	private readonly MusicHelper _music = new();
 	private readonly DispatcherTimer _gameTimer = new();
 	private readonly LinkedList<MoveDirection> _directionChanges = new();
-	private static readonly string _pathToSnakeFolder = Path.Combine(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%"), "Snake");
 	private readonly FileHelper<List<HighScore>> _fileHighScore = new(Path.Combine(_pathToSnakeFolder, "HighScores.json"));
 	private readonly FileHelper<OptionsViewModel> _fileOptions = new(Path.Combine(_pathToSnakeFolder, "Options.json"));
 
@@ -32,6 +33,19 @@ internal class MainViewModel : BaseViewModel
 	};
 
 	private MoveDirection _moveDirection;
+	private SegmentViewModel _food;
+	private string _countdownText;
+	private string _currentPlayerName;
+	private int _currentScore;
+	private bool _mainMenuVisible;
+	private bool _playGameVisible;
+	private bool _highScoresVisible;
+	private bool _countdownVisible;
+	private bool _newHighScoreVisible;
+	private bool _optionsMenuVisible;
+	private bool _gameOverMenuVisible;
+	private bool _topTextTitleVisible;
+	private bool _topTextScoreVisible;
 
 	public MainViewModel()
 	{
@@ -39,156 +53,89 @@ internal class MainViewModel : BaseViewModel
 		ReadOptions();
 		ReadHighScores();
 		SetWindowState();
-		Snake = new();
+		Snake = [];
 		_gameTimer.Tick += GameTimer_Tick;
 	}
 
 	#region Property binding
 
-	/// <summary>
-	/// Flag to set game over status
-	/// </summary>
 	public bool IsGameOver { get; set; }
-
-	/// <summary>
-	/// Property that represents the game options
-	/// </summary>
 	public OptionsViewModel Options { get; set; }
-
-	/// <summary>
-	/// An observable collection that represents the snake on the screen
-	/// </summary>
 	public ObservableCollection<SegmentViewModel> Snake { get; set; }
-
-	/// <summary>
-	/// An observable collection that represents the high score list
-	/// </summary>
 	public ObservableCollection<HighScore> HighScoreList { get; set; }
 
-	/// <summary>
-	/// Property that represents the food on the screen
-	/// </summary>
-	private SegmentViewModel _food;
 	public SegmentViewModel Food
 	{
 		get => _food;
 		set { _food = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Property that represents the countdown text on the screen before the game start
-	/// </summary>
-	private string _countdownText;
 	public string CountdownText
 	{
 		get => _countdownText;
 		set { _countdownText = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Property that represents the player name
-	/// </summary>
-	private string _currentPlayerName;
 	public string CurrentPlayerName
 	{
 		get => _currentPlayerName;
 		set { _currentPlayerName = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Property that stores the current score
-	/// </summary>
-	private int _currentScore;
 	public int CurrentScore
 	{
 		get => _currentScore;
 		set { _currentScore = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the countdown text
-	/// </summary>
-	private bool _countdownVisible;
 	public bool CountdownVisible
 	{
 		get => _countdownVisible;
 		set { _countdownVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the main menu
-	/// </summary>
-	private bool _mainMenuVisible;
 	public bool MainMenuVisible
 	{
 		get => _mainMenuVisible;
 		set { _mainMenuVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the main menu
-	/// </summary>
-	private bool _playGameVisible;
 	public bool PlayGameVisible
 	{
 		get => _playGameVisible;
 		set { _playGameVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the high scores
-	/// </summary>
-	private bool _highScoresVisible;
 	public bool HighScoresVisible
 	{
 		get => _highScoresVisible;
 		set { _highScoresVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the new high score
-	/// </summary>
-	private bool _newHighScoreVisible;
 	public bool NewHighScoreVisible
 	{
 		get => _newHighScoreVisible;
 		set { _newHighScoreVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the options menu
-	/// </summary>
-	private bool _optionsMenuVisible;
 	public bool OptionsMenuVisible
 	{
 		get => _optionsMenuVisible;
 		set { _optionsMenuVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the game over menu
-	/// </summary>
-	private bool _gameOverMenuVisible;
 	public bool GameOverMenuVisible
 	{
 		get => _gameOverMenuVisible;
 		set { _gameOverMenuVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the text with window title
-	/// </summary>
-	private bool _topTextTitleVisible;
 	public bool TopTextTitleVisible
 	{
 		get => _topTextTitleVisible;
 		set { _topTextTitleVisible = value; OnPropertyChanged(); }
 	}
 
-	/// <summary>
-	/// Flag to set the visibility of the text with actual score
-	/// </summary>
-	private bool _topTextScoreVisible;
 	public bool TopTextScoreVisible
 	{
 		get => _topTextScoreVisible;
@@ -248,9 +195,11 @@ internal class MainViewModel : BaseViewModel
 		_gameTimer.Start();
 	}
 
-	private void ShowMainMenu(object commandParameter) => ShowMainMenuPanel();
+	private void ShowMainMenu(object commandParameter)
+		=> ShowMainMenuPanel();
 
-	private void ShowHighScores(object commandParameter) => ShowHighScoresPanel();
+	private void ShowHighScores(object commandParameter)
+		=> ShowHighScoresPanel();
 
 	private void SaveNewHighScore(object commandParameter)
 	{
@@ -272,11 +221,14 @@ internal class MainViewModel : BaseViewModel
 		ShowHighScoresPanel();
 	}
 
-	private void ShowOptions(object commandParameter) => ShowOptionsMenuPanel();
+	private void ShowOptions(object commandParameter)
+		=> ShowOptionsMenuPanel();
 
-	private void IncreaseSnakeSpeed(object commandParameter) => Options.SnakeSpeed++;
+	private void IncreaseSnakeSpeed(object commandParameter)
+		=> Options.SnakeSpeed++;
 
-	private void DecreaseSnakeSpeed(object commandParameter) => Options.SnakeSpeed--;
+	private void DecreaseSnakeSpeed(object commandParameter)
+		=> Options.SnakeSpeed--;
 
 	private void IncreaseGameGridSize(object commandParameter)
 	{
@@ -300,9 +252,11 @@ internal class MainViewModel : BaseViewModel
 		}
 	}
 
-	private void IncreaseSoundVolume(object commandParameter) => _music.SetVolume(Options.SoundVolume++);
+	private void IncreaseSoundVolume(object commandParameter)
+		=> _music.SetVolume(Options.SoundVolume++);
 
-	private void DecreaseSoundVolume(object commandParameter) => _music.SetVolume(Options.SoundVolume--);
+	private void DecreaseSoundVolume(object commandParameter)
+		=> _music.SetVolume(Options.SoundVolume--);
 
 	private void SaveOptions(object commandParameter)
 	{
@@ -310,7 +264,8 @@ internal class MainViewModel : BaseViewModel
 		ShowMainMenuPanel();
 	}
 
-	private void GameOver(object commandParameter) => IsGameOver = true;
+	private void GameOver(object commandParameter)
+		=> IsGameOver = true;
 
 	private void ChangeSnakeDirection(object commandParameter)
 	{
@@ -350,9 +305,11 @@ internal class MainViewModel : BaseViewModel
 		_music.SetVolume(Options.SoundVolume);
 	}
 
-	private void ReadHighScores() => HighScoreList = new(_fileHighScore.DeserializeFromJSON());
+	private void ReadHighScores()
+		=> HighScoreList = new(_fileHighScore.DeserializeFromJSON());
 
-	private void SaveHighScores() => _fileHighScore.SerializeToJSON(HighScoreList.ToList());
+	private void SaveHighScores()
+		=> _fileHighScore.SerializeToJSON(HighScoreList.ToList());
 
 	private async Task ShowCountDown()
 	{
@@ -401,7 +358,8 @@ internal class MainViewModel : BaseViewModel
 		return newDirection != lastDirection && newDirection != OppositeDirection(lastDirection);
 	}
 
-	private MoveDirection GetLastDirection() => _directionChanges.Count == 0 ? _moveDirection : _directionChanges.Last.Value;
+	private MoveDirection GetLastDirection()
+		=> _directionChanges.Count == 0 ? _moveDirection : _directionChanges.Last.Value;
 
 	private MoveDirection OppositeDirection(MoveDirection moveDirection) => moveDirection switch
 	{
@@ -451,7 +409,8 @@ internal class MainViewModel : BaseViewModel
 		await Task.Delay(1000);
 	}
 
-	private bool CheckIfNewHighScore() => HighScoreList.Count == 0 || (CurrentScore >= HighScoreList.Min(x => x.Score));
+	private bool CheckIfNewHighScore()
+		=> HighScoreList.Count == 0 || (CurrentScore >= HighScoreList.Min(x => x.Score));
 
 	private void MakeNewFood()
 	{
@@ -570,7 +529,8 @@ internal class MainViewModel : BaseViewModel
 		}
 	}
 
-	private void MinimizeWindow(object commandParameter) => (commandParameter as Window).WindowState = WindowState.Minimized;
+	private void MinimizeWindow(object commandParameter)
+		=> (commandParameter as Window).WindowState = WindowState.Minimized;
 
 	#region Show/Hide Panels
 

@@ -15,11 +15,11 @@
 		  Background="Black">
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
 		</Grid.RowDefinitions>
 
 		<TextBlock x:Name="TxtInfo"

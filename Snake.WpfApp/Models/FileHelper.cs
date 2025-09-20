@@ -3,21 +3,20 @@ using System.Text.Json;
 
 namespace Snake.WpfApp.Models;
 
-internal class FileHelper<T> where T : new()
+internal class FileHelper<T>(string filePath) where T : new()
 {
-	private readonly string _filePath;
-
-	public FileHelper(string filePath) => _filePath = filePath;
+	private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+	private readonly string _filePath = filePath;
 
 	public void SerializeToJSON(T item)
 	{
 		var directoryName = Path.GetDirectoryName(_filePath);
-		if (!Directory.Exists(directoryName))
+		if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName))
 		{
 			Directory.CreateDirectory(directoryName);
 		}
 
-		var json = JsonSerializer.Serialize(item, new JsonSerializerOptions { WriteIndented = true });
+		var json = JsonSerializer.Serialize(item, _jsonOptions);
 		File.WriteAllText(_filePath, json);
 	}
 
@@ -29,6 +28,6 @@ internal class FileHelper<T> where T : new()
 		}
 
 		var json = File.ReadAllText(_filePath);
-		return JsonSerializer.Deserialize<T>(json);
+		return JsonSerializer.Deserialize<T>(json) ?? new T();
 	}
 }

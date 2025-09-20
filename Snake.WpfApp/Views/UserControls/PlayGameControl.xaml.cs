@@ -2,10 +2,8 @@
 
 namespace Snake.WpfApp.Views.UserControls;
 
-/// <summary>
-/// Interaction logic for PlayGameControl.xaml
-/// </summary>
 public partial class PlayGameControl : UserControl
 {
-	public PlayGameControl() => InitializeComponent();
+	public PlayGameControl()
+		=> InitializeComponent();
 }

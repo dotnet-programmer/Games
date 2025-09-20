@@ -60,7 +60,7 @@
 					Content="__"
 					Style="{StaticResource BtnMinimizeStyle}"
 					Command="{Binding MinimizeWindowCommand}"
-					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+					CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" />
 
 			<Button x:Name="BtnClose"
 					Content="X"
@@ -69,7 +69,7 @@
 				<i:Interaction.Triggers>
 					<i:EventTrigger EventName="Click">
 						<i:CallMethodAction MethodName="Close"
-											TargetObject="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}" />
+											TargetObject="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" />
 					</i:EventTrigger>
 				</i:Interaction.Triggers>
 			</Button>

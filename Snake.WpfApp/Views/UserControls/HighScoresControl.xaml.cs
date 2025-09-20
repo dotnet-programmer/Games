@@ -2,10 +2,8 @@
 
 namespace Snake.WpfApp.Views.UserControls;
 
-/// <summary>
-/// Interaction logic for HighScoresControl.xaml
-/// </summary>
 public partial class HighScoresControl : UserControl
 {
-	public HighScoresControl() => InitializeComponent();
+	public HighScoresControl()
+		=> InitializeComponent();
 }

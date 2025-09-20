@@ -15,5 +15,6 @@ internal class Images
 	public static readonly ImageSource DeadBody = LoadImage("DeadBody.png");
 	public static readonly ImageSource DeadTail = LoadImage("DeadTail.png");
 
-	private static ImageSource LoadImage(string fileName) => new BitmapImage(new Uri($"/Resources/Images/{fileName}", UriKind.Relative));
+	private static BitmapImage LoadImage(string fileName)
+		=> new(new Uri($"/Resources/Images/{fileName}", UriKind.Relative));
 }

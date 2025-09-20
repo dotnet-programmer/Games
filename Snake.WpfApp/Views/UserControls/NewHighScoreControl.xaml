@@ -14,10 +14,10 @@
 		  Background="Black">
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
 		</Grid.RowDefinitions>
 
 		<TextBlock x:Name="TxtInfo"
@@ -44,7 +44,7 @@
 
 			<TextBox x:Name="TbCurrentPlayerName"
 					 Width="200"
-					 Height="Auto"
+					 Height="60"
 					 Margin="5,20,10,20"
 					 Background="Black"
 					 Foreground="Green"

@@ -6,6 +6,9 @@ namespace Snake.WpfApp.ViewModels;
 
 internal class SegmentViewModel : BaseViewModel
 {
+	private ImageSource? _imageSource;
+	private double _rotation;
+
 	public SegmentViewModel(int xPos, int yPos, int segmentSize, SegmentKind snakeSegmentKind)
 	{
 		XPos = xPos;
@@ -17,6 +20,7 @@ internal class SegmentViewModel : BaseViewModel
 			SegmentKind.Body => Images.Body,
 			SegmentKind.Tail => Images.Tail,
 			SegmentKind.Food => Images.Food,
+			_ => throw new System.NotImplementedException(),
 		};
 	}
 
@@ -24,14 +28,12 @@ internal class SegmentViewModel : BaseViewModel
 	public int YPos { get; set; }
 	public int SegmentSize { get; set; }
 
-	private double _rotation;
 	public double Rotation
 	{
 		get => _rotation;
 		set { _rotation = value; OnPropertyChanged(); }
 	}
 
-	private ImageSource? _imageSource;
 	public ImageSource? ImageSource
 	{
 		get => _imageSource;
