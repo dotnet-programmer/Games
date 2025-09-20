@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows7.0</TargetFramework>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <RootNamespace>MemoryGameMVVM.WPF</RootNamespace>
   </PropertyGroup>

@@ -5,9 +5,6 @@ using MemoryGame.WpfApp.ViewModels;
 
 namespace MemoryGame.WpfApp.View;
 
-/// <summary>
-/// Interaction logic for MainView.xaml
-/// </summary>
 public partial class MainView : Window
 {
 	public MainView()

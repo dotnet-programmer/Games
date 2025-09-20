@@ -5,27 +5,36 @@ using System.Windows.Input;
 
 namespace MemoryGame.WpfApp.Commands;
 
-internal class RelayCommandAsync(Func<object, Task> execute, Func<object, bool> canExecute = null) : ICommand
+internal class RelayCommandAsync(Func<object?, Task> execute, Predicate<object?>? canExecute = null) : ICommand
 {
-	private readonly Func<object, Task> _execute = execute;
-	private readonly Func<object, bool> _canExecute = canExecute ?? (o => true);
+	private readonly Func<object?, Task> _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+	private readonly Predicate<object?>? _canExecute = canExecute;
 
 	private long _isExecuting;
 
-	public event EventHandler CanExecuteChanged
+	// execute with parameter, canExecute without parameter
+	public RelayCommandAsync(Func<object?, Task> execute, Func<bool>? canExecute = null) : this(
+		execute ?? throw new ArgumentNullException(nameof(execute)),
+		canExecute != null ? _ => canExecute() : null)
+	{
+	}
+
+	public event EventHandler? CanExecuteChanged
 	{
 		add => CommandManager.RequerySuggested += value;
 		remove => CommandManager.RequerySuggested -= value;
 	}
 
-	public void RaiseCanExecuteChanged()
-		=> CommandManager.InvalidateRequerySuggested();
+	public bool CanExecute(object? parameter)
+		=> Interlocked.Read(ref _isExecuting) == 0 && (_canExecute == null || _canExecute(parameter));
 
-	public bool CanExecute(object parameter)
-		=> Interlocked.Read(ref _isExecuting) == 0 && _canExecute(parameter);
-
-	public async void Execute(object parameter)
+	public async void Execute(object? parameter)
 	{
+		if (!CanExecute(parameter))
+		{
+			return;
+		}
+
 		Interlocked.Exchange(ref _isExecuting, 1);
 		RaiseCanExecuteChanged();
 
@@ -39,4 +48,7 @@ internal class RelayCommandAsync(Func<object, Task> execute, Func<object, bool> 
 			RaiseCanExecuteChanged();
 		}
 	}
+
+	public void RaiseCanExecuteChanged()
+		=> CommandManager.InvalidateRequerySuggested();
 }
