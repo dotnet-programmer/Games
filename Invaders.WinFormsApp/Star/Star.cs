@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Invaders.WinFormsApp.Star;
 
-namespace Invaders.WinFormsApp.Star;
-internal struct Star
+internal struct Star(Point point, Pen pen)
 {
-	public Point point;
-	public Pen pen;
-
-	public Star(Point point, Pen pen)
-	{
-		this.point = point;
-		this.pen = pen;
-	}
+	public Point Point = point;
+	public Pen Pen = pen;
 }

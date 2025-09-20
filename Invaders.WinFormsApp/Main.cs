@@ -1,62 +1,44 @@
+using Invaders.WinFormsApp.Direction;
+
 namespace Invaders.WinFormsApp;
 
 public partial class Main : Form
 {
-	private readonly List<Keys> _keysPressed = new();
-	private bool _isGameOver = false;
-	private bool _isPaused = false;
-	private int _frame = 0;
-	private int _animationCell = 0;
-	private Game _game;
+	private readonly List<Keys> _keysPressed = [];
+	private bool _isGameOver;
+	private bool _isPaused;
+	private int _frame;
+	private int _animationCell;
+	private Game _game = null!;
 
 	public Main()
 	{
 		InitializeComponent();
-		StartGame();
-	}
-
-	private void StartGame()
-	{
-		_game = new Game(this.ClientRectangle);
-		_game.GameOver += Game_GameOver;
-
-		AnimationTimer.Start();
-		GameTimer.Start();
-
-		_isPaused = false;
-		_isGameOver = false;
-	}
-
-	private void Game_GameOver()
-	{
-		GameTimer.Stop();
-		_game._isGameOver = true;
-		_isGameOver = true;
-		//Invalidate();
+		StartNewGame();
 	}
 
 	private void Main_KeyDown(object sender, KeyEventArgs e)
 	{
-		// wyjœcie
+		// Exit
 		if (e.KeyCode == Keys.Escape)
 		{
 			Application.Exit();
 		}
 
-		// ponowne uruchomienie gry i restart zegarów
+		// Restart game
 		if ((_isGameOver && e.KeyCode == Keys.S) || (e.KeyCode == Keys.R))
 		{
-			StartGame();
+			StartNewGame();
 			return;
 		}
 
-		// strza³
+		// Shot
 		if (e.KeyCode == Keys.Space && !_isPaused)
 		{
 			_game.FireShot();
 		}
 
-		// pauza
+		// Pause
 		if (e.KeyCode == Keys.P)
 		{
 			if (GameTimer.Enabled)
@@ -71,26 +53,16 @@ public partial class Main : Form
 			}
 		}
 
-		if (_keysPressed.Contains(e.KeyCode))
-		{
-			_keysPressed.Remove(e.KeyCode);
-		}
-
+		_keysPressed.Remove(e.KeyCode);
 		_keysPressed.Add(e.KeyCode);
 	}
 
 	private void Main_KeyUp(object sender, KeyEventArgs e)
-	{
-		if (_keysPressed.Contains(e.KeyCode))
-		{
-			_keysPressed.Remove(e.KeyCode);
-		}
-	}
+		=> _keysPressed.Remove(e.KeyCode);
 
-	// zegar gry
 	private void GameTimer_Tick(object sender, EventArgs e)
 	{
-		_game.Go();
+		_game.GoNextFrame();
 
 		foreach (var item in _keysPressed)
 		{
@@ -107,7 +79,7 @@ public partial class Main : Form
 		}
 	}
 
-	// aktualizacja obrazków reprezentuj¹cych poszczególne klatki animacji najeŸdŸców
+	// Update images representing individual frames of the invaders' animation
 	private void AnimationTimer_Tick(object sender, EventArgs e)
 	{
 		_frame++;
@@ -124,5 +96,22 @@ public partial class Main : Form
 		Refresh();
 	}
 
-	private void Main_Paint(object sender, PaintEventArgs e) => _game.Draw(e.Graphics, _animationCell, _isPaused);
+	private void Main_Paint(object sender, PaintEventArgs e)
+		=> _game.Draw(e.Graphics, _animationCell, _isPaused);
+
+	private void StartNewGame()
+	{
+		_game = new Game(this.ClientRectangle);
+		_game.GameOver += Game_GameOver;
+		_isPaused = _isGameOver = false;
+		AnimationTimer.Start();
+		GameTimer.Start();
+	}
+
+	private void Game_GameOver(object? sender, EventArgs e)
+	{
+		GameTimer.Stop();
+		_game.IsGameOver = true;
+		_isGameOver = true;
+	}
 }

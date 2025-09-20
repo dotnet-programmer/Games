@@ -1,115 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.Text;
-using System.Threading.Tasks;
-using Invaders.WinFormsApp.Enemies;
-using Invaders.WinFormsApp.Properties;
+﻿using Invaders.WinFormsApp.Enemies;
+using Invaders.WinFormsApp.Direction;
 using Invaders.WinFormsApp.Star;
 
 namespace Invaders.WinFormsApp;
+
 internal class Game
 {
-	private int _score;
-	private int _livesLeft;
-	private int _wave;
+	private const int NumberOfStars = 300;
+	private const int PlayerLives = 3;
+	private const int InvadersCount = 30;
+	private const int StartingWave = 1;
+	private const int StartingDirectionsCount = 2;
+	private const int MaxPlayerShotsCount = 5;
 
-	private DateTime start = DateTime.Now;
-	private DateTime end;
-
-	private readonly Random _random;
-	private Rectangle _playfield;
-
+	private readonly Random _random = new();
 	private readonly Stars _stars;
-
 	private readonly PlayerShip _playerShip;
-	private readonly List<Shot> _playerShots;
-	private readonly Image _playerShipImage = ImageUtil.ResizeImage(Resources.player_ship, 60, 50);
+	private readonly List<Shot> _playerShots = [];
+	private readonly List<Shot> _invaderShots = [];
 
-	private List<Invader> _invaders;
-	private List<Shot> _invaderShots;
-	private MoveDirection _invaderDirection;
+	private int _score;
+	private int _livesLeft = PlayerLives;
+	private int _wave = StartingWave;
+	private DateTime _start = DateTime.Now;
+	private DateTime _end;
+	private Rectangle _playfield;
+	private List<Invader> _invaders = null!;
+	private MoveDirection _invadersDirection;
 
-	//public event GameOverDelegate GameOver;
-	public event Action GameOver;
-	public bool _isGameOver;
+	public event EventHandler? GameOver;
+	public bool IsGameOver;
 
 	public Game(Rectangle playfield)
 	{
 		_playfield = playfield;
-		_stars = new Stars(300, playfield);
-		_random = new();
-		_livesLeft = 2;
-		_score = 0;
-		_wave = 1;
-		_isGameOver = false;
-
+		_stars = new(NumberOfStars, playfield);
 		_playerShip = new(playfield);
-		_playerShots = new();
-
 		MakeInvaders();
+		_invadersDirection = (MoveDirection)_random.Next(StartingDirectionsCount);
 	}
 
-	private void MakeInvaders()
+	// The game clock of the form calls the GoNextFrame method of the Game object
+	public void GoNextFrame()
 	{
-		_invaders = new List<Invader>(30);
-		int x = _playfield.Width / 2 - 220;
-		int y = 40;
-		for (int i = 5; i > 0; i--)
-		{
-			for (int j = 0; j < 6; j++)
-			{
-				Invader invader = new Invader((InvaderType)i, new Point(x + j * 80, y), i * 10);
-				_invaders.Add(invader);
-			}
-			y += 60;
-		}
+		MoveShots(_playerShots);
+		MoveInvaders();
+		RandomInvaderShot();
+		MoveShots(_invaderShots);
+		CheckForInvaderCollisions();
+		CheckForPlayerCollisions();
+	}
 
-		_invaderDirection = (MoveDirection)_random.Next(2);
-		_invaderShots = new();
+	public void MovePlayer(MoveDirection direction)
+		=> _playerShip.Move(direction);
+
+	public void FireShot()
+	{
+		if (_playerShots.Count < MaxPlayerShotsCount)
+		{
+			_playerShots.Add(new Shot(_playerShip.ShotLocation, MoveDirection.Up, _playfield));
+		}
 	}
 
 	#region drawing region
 
 	public void Draw(Graphics graphics, int animationCell, bool isPaused)
 	{
-		// czarny prostokąt
+		// Background
 		graphics.FillRectangle(Brushes.Black, _playfield);
 
-		// gwiazdy
 		_stars.Draw(graphics, animationCell);
-
-		// najeźdźcy 
 		_invaders.ForEach(i => i.Draw(graphics, animationCell));
-
-		// statek gracza
 		_playerShip.Draw(graphics);
 
-		// pociski
-		_playerShots.ForEach(ps => ps.Draw(graphics, Brushes.DodgerBlue));
-		_invaderShots.ForEach(ps => ps.Draw(graphics, Brushes.Red));
+		_playerShots.ForEach(s => s.Draw(graphics));
+		_invaderShots.ForEach(s => s.Draw(graphics));
 
-		// zdobyte punkty
 		DrawScore(graphics);
-
-		// numer fali
 		DrawWave(graphics);
-
-		// liczba żyć
 		DrawRemainingLife(graphics);
-
-		// liczba klatek grafiki / s
 		DrawFrameRate(graphics);
-
-		// Pauza
+		
 		if (isPaused)
 		{
 			DrawPause(graphics);
 		}
 
-		// "GAME OVER"
-		if (_isGameOver)
+		if (IsGameOver)
 		{
 			DrawGameOver(graphics);
 		}
@@ -117,35 +94,39 @@ internal class Game
 
 	private void DrawScore(Graphics graphics)
 	{
+		int distanceFromEdge = 5;
 		using (Font font = new("Arial", 18))
 		{
-			graphics.DrawString($"Wynik: {_score}", font, Brushes.Yellow, new Point(_playfield.Left + 5, _playfield.Top + 5));
+			graphics.DrawString($"Wynik: {_score}", font, Brushes.Yellow, new Point(_playfield.Left + distanceFromEdge, _playfield.Top + distanceFromEdge));
 		}
 	}
 
 	private void DrawWave(Graphics graphics)
 	{
+		int distanceFromEdge = 5;
 		using (Font font = new("Arial", 18))
 		{
 			string waveMsg = "Fala:";
 			SizeF size = graphics.MeasureString(waveMsg, font);
-			graphics.DrawString($"{waveMsg} {_wave}", font, Brushes.Yellow, new Point(_playfield.Left + 5, _playfield.Top + (int)size.Height + 5));
+			graphics.DrawString($"{waveMsg} {_wave}", font, Brushes.Yellow, new Point(_playfield.Left + distanceFromEdge, _playfield.Top + (int)size.Height + distanceFromEdge));
 		}
 	}
 
 	private void DrawRemainingLife(Graphics graphics)
 	{
+		int distanceFromEdge = 5;
+		Image playerShipImage = _playerShip.Image;
 		for (int i = 0; i < _livesLeft; i++)
 		{
-			graphics.DrawImageUnscaled(_playerShipImage, (_playfield.Width - 5) - (_playerShipImage.Width + 10) * i - _playerShipImage.Width, _playfield.Y + 10);
+			graphics.DrawImageUnscaled(playerShipImage, (_playfield.Width - distanceFromEdge) - (playerShipImage.Width + distanceFromEdge) * i - playerShipImage.Width, _playfield.Y + distanceFromEdge);
 		}
 	}
 
 	private void DrawFrameRate(Graphics graphics)
 	{
-		end = DateTime.Now;
-		TimeSpan frameDuration = end - start;
-		start = end;
+		_end = DateTime.Now;
+		TimeSpan frameDuration = _end - _start;
+		_start = _end;
 
 		double milliSeconds = frameDuration.TotalMilliseconds;
 		string message = milliSeconds != 0.0 ?
@@ -165,14 +146,14 @@ internal class Game
 		using (Font font = new("Arial", 64, FontStyle.Bold))
 		{
 			SizeF sizePause = graphics.MeasureString(message, font);
-			graphics.DrawString(message, font, Brushes.Red, new Point(_playfield.Right / 2 - (int)sizePause.Width / 2, _playfield.Bottom / 2 - 30 - (int)sizePause.Height / 2));
+			graphics.DrawString(message, font, Brushes.Red, new Point(_playfield.Right / 2 - (int)sizePause.Width / 2, _playfield.Bottom / 2 - (int)sizePause.Height / 2));
 		}
 	}
 
 	private void DrawGameOver(Graphics graphics)
 	{
 		int pointX = _playfield.Right / 2;
-		int pointY = _playfield.Bottom / 2 - 30;
+		int pointY = _playfield.Bottom / 2;
 
 		SizeF sizeGameOver;
 		Rectangle background;
@@ -207,24 +188,28 @@ internal class Game
 
 	#endregion
 
-	// zegar gry formularza wywołuje metodę Go obiektu Game
-	public void Go()
+	private void MakeInvaders()
 	{
-		// przesunięcie pocisków
-		MoveShots(_playerShots);
+		_invaders = new(InvadersCount);
 
-		// wykonanie ruchu każdego invadersa i oddanie ich strzałów
-		MoveInvaders();
-		InvaderFire();
-		MoveShots(_invaderShots);
+		int x = _playfield.Width / 2 - 220;
+		int y = 40;
+		int verticalOffset = 60;
+		int horizontallOffset = 80;
+		int invaderTypesCount = Enum.GetNames<InvaderType>().Length;
+		int invadersInRow = 6;
 
-		// sprawdzanie zdarzeń:
-		CheckForInvaderCollisions();
-		CheckForPlayerCollisions();
+		for (int i = invaderTypesCount; i > 0; i--)
+		{
+			for (int j = 0; j < invadersInRow; j++)
+			{
+				_invaders.Add(new Invader((InvaderType)i, new Point(x + j * horizontallOffset, y), i * 10));
+			}
+			y += verticalOffset;
+		}
 	}
 
-	// tworzy następny nalot najeźdźców
-	private void NextWave()
+	private void NextInvadersWave()
 	{
 		_wave++;
 		_playerShots.Clear();
@@ -232,19 +217,6 @@ internal class Game
 		MakeInvaders();
 	}
 
-	// przesuwa statek gracza
-	public void MovePlayer(MoveDirection direction) => _playerShip.Move(direction);
-
-	// strzela pociskami gracza
-	public void FireShot()
-	{
-		if (_playerShots.Count < 5)
-		{
-			_playerShots.Add(new Shot(_playerShip.ShotLocation, MoveDirection.Up, _playfield));
-		}
-	}
-
-	// porusza pociskami
 	private void MoveShots(List<Shot> shots)
 	{
 		for (int i = shots.Count - 1; i >= 0; i--)
@@ -256,7 +228,6 @@ internal class Game
 		}
 	}
 
-	// sprawdza, czy gracz został trafiony
 	private void CheckForPlayerCollisions()
 	{
 		for (int i = _invaderShots.Count - 1; i >= 0; i--)
@@ -271,14 +242,13 @@ internal class Game
 		if (_livesLeft < 0)
 		{
 			_playerShip.IsAlive = false;
-			GameOver.Invoke();
+			OnGameOver(EventArgs.Empty);
 		}
 	}
 
-	// sprawdza czy najeźdźca został trafiony
 	private void CheckForInvaderCollisions()
 	{
-		// usuń najeźdźcę i strzał
+		// Remove the invader and the shot that hit him
 		for (int i = _invaders.Count - 1; i >= 0; i--)
 		{
 			for (int j = _playerShots.Count - 1; j >= 0; j--)
@@ -298,31 +268,33 @@ internal class Game
 			}
 		}
 
-		// następna fala jeśli wszyscy invadersi zginęli
+		// Next wave if all invaders killed
 		if (_invaders.Count == 0)
 		{
-			NextWave();
+			NextInvadersWave();
 		}
 
-		// sprawdzenie czy najeźdźca nie osiągnął dolnej krawędzi ekranu - jeśli tak zakończ grę
+		// Check if the invader has reached the bottom edge of the screen - if so, end the game
 		if (_invaders.Max(x => x.Location.Y) > _playfield.Bottom - 120)
 		{
 			_playerShip.IsAlive = false;
-			GameOver.Invoke();
+			OnGameOver(EventArgs.Empty);
 		}
 	}
 
-	// porusza całą grupą najeźdźców
+	private void OnGameOver(EventArgs e)
+		=> GameOver?.Invoke(this, e);
+
 	private void MoveInvaders()
 	{
-		_invaders.ForEach(i => i.Move(_invaderDirection));
+		_invaders.ForEach(i => i.Move(_invadersDirection));
 
-		if (_invaderDirection == MoveDirection.Left)
+		if (_invadersDirection == MoveDirection.Left)
 		{
 			if (_invaders.Min(x => x.Location.X) < 20)
 			{
 				_invaders.ForEach(i => i.Move(MoveDirection.Down));
-				_invaderDirection = MoveDirection.Right;
+				_invadersDirection = MoveDirection.Right;
 			}
 		}
 		else
@@ -330,14 +302,15 @@ internal class Game
 			if (_invaders.Max(x => x.Location.X) > _playfield.Right - 60)
 			{
 				_invaders.ForEach(i => i.Move(MoveDirection.Down));
-				_invaderDirection = MoveDirection.Left;
+				_invadersDirection = MoveDirection.Left;
 			}
 		}
 	}
 
-	// strzela pociskami invadersa
-	private void InvaderFire()
+	private void RandomInvaderShot()
 	{
+		// With each wave there can be more active missiles at once
+		// In addition, a 50% chance of a shot, so that not every shot appears immediately after the previous one disappears
 		if (_invaderShots.Count < _wave + 2 && _random.Next(10) < 5)
 		{
 			Invader invader = _invaders[_random.Next(_invaders.Count)];
