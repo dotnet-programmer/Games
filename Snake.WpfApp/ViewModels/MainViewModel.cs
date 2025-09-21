@@ -15,6 +15,11 @@ namespace Snake.WpfApp.ViewModels;
 
 internal class MainViewModel : BaseViewModel
 {
+	private const int HighScoreCount = 5;
+	private const int MaxGridSize = 1000;
+	private const int MinGridSize = 400;
+	private const int GridChangeSize = 200;
+
 	private static readonly string _pathToSnakeFolder = Path.Combine(Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%"), "Snake");
 
 	private readonly Random _random = new();
@@ -33,9 +38,9 @@ internal class MainViewModel : BaseViewModel
 	};
 
 	private MoveDirection _moveDirection;
-	private SegmentViewModel _food;
-	private string _countdownText;
-	private string _currentPlayerName;
+	private SegmentViewModel? _food;
+	private string? _countdownText;
+	private string? _currentPlayerName;
 	private int _currentScore;
 	private bool _mainMenuVisible;
 	private bool _playGameVisible;
@@ -51,8 +56,9 @@ internal class MainViewModel : BaseViewModel
 	{
 		SetCommands();
 		ReadOptions();
+		SetMusicVolme(Options!.SoundVolume);
 		ReadHighScores();
-		SetWindowState();
+		SetMainWindowState();
 		Snake = [];
 		_gameTimer.Tick += GameTimer_Tick;
 	}
@@ -62,21 +68,21 @@ internal class MainViewModel : BaseViewModel
 	public bool IsGameOver { get; set; }
 	public OptionsViewModel Options { get; set; }
 	public ObservableCollection<SegmentViewModel> Snake { get; set; }
-	public ObservableCollection<HighScore> HighScoreList { get; set; }
+	public ObservableCollection<HighScore> HighScoreList { get; set; } = default!;
 
-	public SegmentViewModel Food
+	public SegmentViewModel? Food
 	{
 		get => _food;
 		set { _food = value; OnPropertyChanged(); }
 	}
 
-	public string CountdownText
+	public string? CountdownText
 	{
 		get => _countdownText;
 		set { _countdownText = value; OnPropertyChanged(); }
 	}
 
-	public string CurrentPlayerName
+	public string? CurrentPlayerName
 	{
 		get => _currentPlayerName;
 		set { _currentPlayerName = value; OnPropertyChanged(); }
@@ -146,21 +152,21 @@ internal class MainViewModel : BaseViewModel
 
 	#region Commands
 
-	public ICommand StartNewGameCommand { get; private set; }
-	public ICommand ShowMainMenuCommand { get; private set; }
-	public ICommand ShowHighScoresCommand { get; private set; }
-	public ICommand SaveNewHighScoreCommand { get; private set; }
-	public ICommand ShowOptionsCommand { get; private set; }
-	public ICommand IncreaseSnakeSpeedCommand { get; private set; }
-	public ICommand DecreaseSnakeSpeedCommand { get; private set; }
-	public ICommand IncreaseGameGridSizeCommand { get; private set; }
-	public ICommand DecreaseGameGridSizeCommand { get; private set; }
-	public ICommand IncreaseSoundVolumeCommand { get; private set; }
-	public ICommand DecreaseSoundVolumeCommand { get; private set; }
-	public ICommand SaveOptionsCommand { get; private set; }
-	public ICommand GameOverCommand { get; private set; }
-	public ICommand ChangeSnakeDirectionCommand { get; private set; }
-	public ICommand MinimizeWindowCommand { get; private set; }
+	public ICommand StartNewGameCommand { get; private set; } = default!;
+	public ICommand ShowMainMenuCommand { get; private set; } = default!;
+	public ICommand ShowHighScoresCommand { get; private set; } = default!;
+	public ICommand SaveNewHighScoreCommand { get; private set; } = default!;
+	public ICommand ShowOptionsCommand { get; private set; } = default!;
+	public ICommand IncreaseSnakeSpeedCommand { get; private set; } = default!;
+	public ICommand DecreaseSnakeSpeedCommand { get; private set; } = default!;
+	public ICommand IncreaseGameGridSizeCommand { get; private set; } = default!;
+	public ICommand DecreaseGameGridSizeCommand { get; private set; } = default!;
+	public ICommand IncreaseSoundVolumeCommand { get; private set; } = default!;
+	public ICommand DecreaseSoundVolumeCommand { get; private set; } = default!;
+	public ICommand SaveOptionsCommand { get; private set; } = default!;
+	public ICommand GameOverCommand { get; private set; } = default!;
+	public ICommand ChangeSnakeDirectionCommand { get; private set; } = default!;
+	public ICommand MinimizeWindowCommand { get; private set; } = default!;
 
 	#endregion Commands
 
@@ -183,10 +189,10 @@ internal class MainViewModel : BaseViewModel
 		MinimizeWindowCommand = new RelayCommand(MinimizeWindow);
 	}
 
-	private async Task StartNewGameAsync(object commandParameter)
+	private async Task StartNewGameAsync()
 	{
 		SetTimerInterval();
-		SetGameState();
+		SetNewGameState();
 		SetNewSnake();
 		MakeNewFood();
 		ShowPlayGamePanel();
@@ -195,13 +201,13 @@ internal class MainViewModel : BaseViewModel
 		_gameTimer.Start();
 	}
 
-	private void ShowMainMenu(object commandParameter)
+	private void ShowMainMenu()
 		=> ShowMainMenuPanel();
 
-	private void ShowHighScores(object commandParameter)
+	private void ShowHighScores()
 		=> ShowHighScoresPanel();
 
-	private void SaveNewHighScore(object commandParameter)
+	private void SaveNewHighScore()
 	{
 		int index = 0;
 		if (HighScoreList.Any())
@@ -213,7 +219,7 @@ internal class MainViewModel : BaseViewModel
 			CurrentPlayerName = "Snake Player";
 		}
 		HighScoreList.Insert(index, new() { PlayerName = CurrentPlayerName, Score = CurrentScore });
-		if (HighScoreList.Count > 5)
+		if (HighScoreList.Count > HighScoreCount)
 		{
 			HighScoreList.Remove(HighScoreList.Last());
 		}
@@ -221,53 +227,57 @@ internal class MainViewModel : BaseViewModel
 		ShowHighScoresPanel();
 	}
 
-	private void ShowOptions(object commandParameter)
+	private void ShowOptions()
 		=> ShowOptionsMenuPanel();
 
-	private void IncreaseSnakeSpeed(object commandParameter)
+	private void IncreaseSnakeSpeed()
 		=> Options.SnakeSpeed++;
 
-	private void DecreaseSnakeSpeed(object commandParameter)
+	private void DecreaseSnakeSpeed()
 		=> Options.SnakeSpeed--;
 
-	private void IncreaseGameGridSize(object commandParameter)
+	private void IncreaseGameGridSize(object? commandParameter)
 	{
-		if (Options.GameGridSize < 1000)
+		if (Options.GameGridSize < MaxGridSize)
 		{
-			Options.GameGridSize += 200;
-			Window window = commandParameter as Window;
-			window.Left = window.Left - 100;
-			window.Top = window.Top - 100;
+			Options.GameGridSize += GridChangeSize;
+			if (commandParameter is Window window)
+			{
+				window.Left = window.Left - GridChangeSize / 2;
+				window.Top = window.Top - GridChangeSize / 2;
+			}
 		}
 	}
 
-	private void DecreaseGameGridSize(object commandParameter)
+	private void DecreaseGameGridSize(object? commandParameter)
 	{
-		if (Options.GameGridSize > 400)
+		if (Options.GameGridSize > MinGridSize)
 		{
-			Options.GameGridSize -= 200;
-			Window window = commandParameter as Window;
-			window.Left = window.Left + 100;
-			window.Top = window.Top + 100;
+			Options.GameGridSize -= GridChangeSize;
+			if (commandParameter is Window window)
+			{
+				window.Left = window.Left + GridChangeSize / 2;
+				window.Top = window.Top + GridChangeSize / 2;
+			}
 		}
 	}
 
-	private void IncreaseSoundVolume(object commandParameter)
-		=> _music.SetVolume(Options.SoundVolume++);
+	private void IncreaseSoundVolume()
+		=> SetMusicVolme(Options.SoundVolume++);
 
-	private void DecreaseSoundVolume(object commandParameter)
-		=> _music.SetVolume(Options.SoundVolume--);
+	private void DecreaseSoundVolume()
+		=> SetMusicVolme(Options.SoundVolume--);
 
-	private void SaveOptions(object commandParameter)
+	private void SaveOptions()
 	{
 		_fileOptions.SerializeToJSON(Options);
 		ShowMainMenuPanel();
 	}
 
-	private void GameOver(object commandParameter)
+	private void GameOver()
 		=> IsGameOver = true;
 
-	private void ChangeSnakeDirection(object commandParameter)
+	private void ChangeSnakeDirection(object? commandParameter)
 	{
 		if (IsGameOver)
 		{
@@ -281,9 +291,10 @@ internal class MainViewModel : BaseViewModel
 				Key.Up => MoveDirection.Up,
 				Key.Down => MoveDirection.Down,
 				Key.Left => MoveDirection.Left,
-				Key.Right => MoveDirection.Right
+				Key.Right => MoveDirection.Right,
+				_ => throw new InvalidOperationException("Wrong direction!")
 			};
-			ChangeDirection(moveDirection);
+			AddNewMoveDirection(moveDirection);
 		}
 	}
 
@@ -293,17 +304,17 @@ internal class MainViewModel : BaseViewModel
 		_gameTimer.Interval = TimeSpan.FromMilliseconds(interval);
 	}
 
-	private void SetWindowState()
+	private void SetMainWindowState()
 	{
 		_music.PlayMusic(MusicKind.Menu);
 		ShowMainMenuPanel();
 	}
 
 	private void ReadOptions()
-	{
-		Options = _fileOptions.DeserializeFromJSON();
-		_music.SetVolume(Options.SoundVolume);
-	}
+		=> Options = _fileOptions.DeserializeFromJSON();
+
+	private void SetMusicVolme(int soundVolume)
+		=> _music.SetVolume(soundVolume);
 
 	private void ReadHighScores()
 		=> HighScoreList = new(_fileHighScore.DeserializeFromJSON());
@@ -322,7 +333,7 @@ internal class MainViewModel : BaseViewModel
 		CountdownVisible = false;
 	}
 
-	private void SetGameState()
+	private void SetNewGameState()
 	{
 		IsGameOver = false;
 		CurrentScore = 0;
@@ -339,36 +350,32 @@ internal class MainViewModel : BaseViewModel
 		Snake.Add(new SegmentViewModel(startPos - 2 * Options.SegmentSize, startPos, Options.SegmentSize, SegmentKind.Tail));
 	}
 
-	private void ChangeDirection(MoveDirection direction)
+	private void AddNewMoveDirection(MoveDirection direction)
 	{
-		if (CanChangeDirection(direction))
+		if (CanAddNewMoveDirection(direction))
 		{
 			_directionChanges.AddLast(direction);
 		}
 	}
 
-	private bool CanChangeDirection(MoveDirection newDirection)
+	private bool CanAddNewMoveDirection(MoveDirection newDirection)
 	{
-		if (_directionChanges.Count == 2)
-		{
-			return false;
-		}
-
 		MoveDirection lastDirection = GetLastDirection();
 		return newDirection != lastDirection && newDirection != OppositeDirection(lastDirection);
 	}
 
 	private MoveDirection GetLastDirection()
-		=> _directionChanges.Count == 0 ? _moveDirection : _directionChanges.Last.Value;
+		=> _directionChanges.Count == 0 ? _moveDirection : _directionChanges.Last!.Value;
 
-	private MoveDirection OppositeDirection(MoveDirection moveDirection) => moveDirection switch
-	{
-		MoveDirection.Up => MoveDirection.Down,
-		MoveDirection.Down => MoveDirection.Up,
-		MoveDirection.Left => MoveDirection.Right,
-		MoveDirection.Right => MoveDirection.Left,
-		_ => throw new InvalidOperationException("Wrong direction!"),
-	};
+	private MoveDirection OppositeDirection(MoveDirection moveDirection)
+		=> moveDirection switch
+		{
+			MoveDirection.Up => MoveDirection.Down,
+			MoveDirection.Down => MoveDirection.Up,
+			MoveDirection.Left => MoveDirection.Right,
+			MoveDirection.Right => MoveDirection.Left,
+			_ => throw new InvalidOperationException("Wrong direction!"),
+		};
 
 	private async void GameTimer_Tick(object? sender, EventArgs e)
 	{
@@ -437,18 +444,16 @@ internal class MainViewModel : BaseViewModel
 			return;
 		}
 
-		Snake.First().ImageSource = Images.Body;
-		Snake.Insert(0, new SegmentViewModel(newXPos, newYPos, Options.SegmentSize, SegmentKind.Head) { Rotation = _directionRotation[_moveDirection] });
+		AddNewSnakeHead(newXPos, newYPos);
 
-		if (newXPos == Food.XPos && newYPos == Food.YPos)
+		if (Food is not null && newXPos == Food.XPos && newYPos == Food.YPos)
 		{
 			CurrentScore += Options.SnakeSpeed;
 			MakeNewFood();
 		}
 		else
 		{
-			Snake.Remove(Snake.Last());
-			Snake.Last().ImageSource = Images.Tail;
+			RemoveSnakeTail();
 		}
 	}
 
@@ -456,7 +461,7 @@ internal class MainViewModel : BaseViewModel
 	{
 		if (_directionChanges.Count > 0)
 		{
-			_moveDirection = _directionChanges.First.Value;
+			_moveDirection = _directionChanges.First!.Value;
 			_directionChanges.RemoveFirst();
 		}
 	}
@@ -529,8 +534,25 @@ internal class MainViewModel : BaseViewModel
 		}
 	}
 
-	private void MinimizeWindow(object commandParameter)
-		=> (commandParameter as Window).WindowState = WindowState.Minimized;
+	private void AddNewSnakeHead(int newXPos, int newYPos)
+	{
+		Snake.First().ImageSource = Images.Body;
+		Snake.Insert(0, new SegmentViewModel(newXPos, newYPos, Options.SegmentSize, SegmentKind.Head) { Rotation = _directionRotation[_moveDirection] });
+	}
+
+	private void RemoveSnakeTail()
+	{
+		Snake.Remove(Snake.Last());
+		Snake.Last().ImageSource = Images.Tail;
+	}
+
+	private void MinimizeWindow(object? commandParameter)
+	{
+		if (commandParameter is Window window)
+		{
+			window.WindowState = WindowState.Minimized;
+		}
+	}
 
 	#region Show/Hide Panels
 
