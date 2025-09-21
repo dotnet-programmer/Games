@@ -1,4 +1,4 @@
-﻿namespace Invaders.WinFormsApp.Enemies;
+﻿namespace Invaders.WinFormsApp.Models.Enemies;
 
 internal enum InvaderType
 {

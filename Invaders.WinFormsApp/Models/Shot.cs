@@ -1,7 +1,6 @@
-﻿using Invaders.WinFormsApp.Direction;
-using Invaders.WinFormsApp.Properties;
+﻿using Invaders.WinFormsApp.Properties;
 
-namespace Invaders.WinFormsApp;
+namespace Invaders.WinFormsApp.Models;
 
 internal class Shot
 {

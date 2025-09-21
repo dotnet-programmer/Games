@@ -1,4 +1,4 @@
-﻿namespace Invaders.WinFormsApp;
+﻿namespace Invaders.WinFormsApp.Models;
 
 internal class ImageUtil
 {

@@ -1,6 +1,6 @@
-﻿namespace Invaders.WinFormsApp;
+﻿namespace Invaders.WinFormsApp.Views;
 
-partial class Main
+partial class MainView
 {
 	/// <summary>
 	///  Required designer variable.
@@ -29,7 +29,7 @@ partial class Main
 	private void InitializeComponent()
 	{
 		components = new System.ComponentModel.Container();
-		System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
+		System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainView));
 		AnimationTimer = new System.Windows.Forms.Timer(components);
 		GameTimer = new System.Windows.Forms.Timer(components);
 		SuspendLayout();

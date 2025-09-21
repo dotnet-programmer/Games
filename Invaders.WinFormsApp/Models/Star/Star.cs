@@ -1,4 +1,4 @@
-﻿namespace Invaders.WinFormsApp.Star;
+﻿namespace Invaders.WinFormsApp.Models.Star;
 
 internal struct Star(Point point, Pen pen)
 {

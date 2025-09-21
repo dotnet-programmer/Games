@@ -28,7 +28,6 @@ internal class MainViewModel : BaseViewModel
 	private readonly LinkedList<MoveDirection> _directionChanges = new();
 	private readonly FileHelper<List<HighScore>> _fileHighScore = new(Path.Combine(_pathToSnakeFolder, "HighScores.json"));
 	private readonly FileHelper<OptionsViewModel> _fileOptions = new(Path.Combine(_pathToSnakeFolder, "Options.json"));
-
 	private readonly Dictionary<MoveDirection, int> _directionRotation = new()
 	{
 		{ MoveDirection.Up, 0 },

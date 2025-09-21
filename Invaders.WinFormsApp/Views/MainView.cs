@@ -1,17 +1,18 @@
-using Invaders.WinFormsApp.Direction;
+using Invaders.WinFormsApp.Models;
 
-namespace Invaders.WinFormsApp;
+namespace Invaders.WinFormsApp.Views;
 
-public partial class Main : Form
+public partial class MainView : Form
 {
 	private readonly List<Keys> _keysPressed = [];
+
 	private bool _isGameOver;
 	private bool _isPaused;
 	private int _frame;
 	private int _animationCell;
 	private Game _game = null!;
 
-	public Main()
+	public MainView()
 	{
 		InitializeComponent();
 		StartNewGame();

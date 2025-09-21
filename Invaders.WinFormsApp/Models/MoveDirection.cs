@@ -1,4 +1,4 @@
-﻿namespace Invaders.WinFormsApp.Direction;
+﻿namespace Invaders.WinFormsApp.Models;
 
 internal enum MoveDirection
 {

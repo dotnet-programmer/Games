@@ -1,8 +1,7 @@
-﻿using Invaders.WinFormsApp.Enemies;
-using Invaders.WinFormsApp.Direction;
-using Invaders.WinFormsApp.Star;
+﻿using Invaders.WinFormsApp.Models.Enemies;
+using Invaders.WinFormsApp.Models.Star;
 
-namespace Invaders.WinFormsApp;
+namespace Invaders.WinFormsApp.Models;
 
 internal class Game
 {
@@ -80,7 +79,7 @@ internal class Game
 		DrawWave(graphics);
 		DrawRemainingLife(graphics);
 		DrawFrameRate(graphics);
-		
+
 		if (isPaused)
 		{
 			DrawPause(graphics);
@@ -118,7 +117,7 @@ internal class Game
 		Image playerShipImage = _playerShip.Image;
 		for (int i = 0; i < _livesLeft; i++)
 		{
-			graphics.DrawImageUnscaled(playerShipImage, (_playfield.Width - distanceFromEdge) - (playerShipImage.Width + distanceFromEdge) * i - playerShipImage.Width, _playfield.Y + distanceFromEdge);
+			graphics.DrawImageUnscaled(playerShipImage, _playfield.Width - distanceFromEdge - (playerShipImage.Width + distanceFromEdge) * i - playerShipImage.Width, _playfield.Y + distanceFromEdge);
 		}
 	}
 

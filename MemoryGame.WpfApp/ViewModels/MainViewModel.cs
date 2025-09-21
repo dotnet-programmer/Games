@@ -19,7 +19,6 @@ internal class MainViewModel : BaseViewModel
 	private readonly IEnumerable<Button> _buttons;
 
 	private string? _timeElapsed;
-
 	private Button? _lastButtonClicked;
 	private int _tenthsOfSecondsElapsed;
 	private int _matchesFound;

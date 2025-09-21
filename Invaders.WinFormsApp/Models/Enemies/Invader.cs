@@ -1,7 +1,6 @@
 ﻿using System.Resources;
-using Invaders.WinFormsApp.Direction;
 
-namespace Invaders.WinFormsApp.Enemies;
+namespace Invaders.WinFormsApp.Models.Enemies;
 
 internal class Invader
 {
@@ -14,7 +13,6 @@ internal class Invader
 
 	private readonly Bitmap[] _images = new Bitmap[ImagesCount];
 	private readonly InvaderType _invaderType;
-
 	private readonly ResourceSet? _resourceSet = Properties.Resources.ResourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentUICulture, true, true);
 
 	private int _animationCell;
