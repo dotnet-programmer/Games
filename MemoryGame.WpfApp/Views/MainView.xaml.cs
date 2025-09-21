@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MemoryGame.WpfApp.ViewModels;
 
-namespace MemoryGame.WpfApp.View;
+namespace MemoryGame.WpfApp.Views;
 
 public partial class MainView : Window
 {
