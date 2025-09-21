@@ -1,4 +1,4 @@
-﻿namespace Tetris.WinForms
+﻿namespace Tetris.WinForms.Views
 {
 	partial class MainForm
 	{
