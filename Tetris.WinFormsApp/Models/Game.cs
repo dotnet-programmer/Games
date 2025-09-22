@@ -30,7 +30,7 @@ internal class Game
 	{
 		_score = 0;
 		_random = new();
-		_segments = new();
+		_segments = [];
 		_isPaused = false;
 		_playfieldBackground = playfieldBackground;
 
@@ -46,8 +46,7 @@ internal class Game
 		_actualShape = GetNewShape(_playfield.Right - _playfield.Width / 2, _playfield.Top);
 		_nextShape = GetNewShape();
 
-		_gameTimer = new();
-		_gameTimer.Interval = 500;
+		_gameTimer = new() { Interval = 500 };
 		_gameTimer.Tick += GameTimer_Tick;
 	}
 
@@ -134,9 +133,7 @@ internal class Game
 	}
 
 	private void Rotate()
-	{
-		_actualShape.Rotate();
-	}
+		=> _actualShape?.Rotate();
 
 	private void MoveLeft()
 	{

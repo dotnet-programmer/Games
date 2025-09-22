@@ -5,12 +5,11 @@ namespace Tetris.WinForms.Views;
 
 public partial class MainForm : Form
 {
-	private Game _game;
-	private MainMenu _mainMenu;
+	private Game? _game;
+	private MainMenu _mainMenu = default!;
 	private ApplicationState _applicatinState;
-	private Rectangle _playfield;  
-
-	private System.Windows.Forms.Timer _animationTimer;
+	private Rectangle _playfield;
+	private System.Windows.Forms.Timer _animationTimer = default!;
 
 	public MainForm()
 	{
@@ -37,8 +36,8 @@ public partial class MainForm : Form
 		_animationTimer.Start();
 	}
 
-	private void AnimationTimer_Tick(object? sender, EventArgs e) =>
-		Refresh();
+	private void AnimationTimer_Tick(object? sender, EventArgs e)
+		=> Refresh();
 
 	private void StartMenu()
 	{
@@ -60,10 +59,13 @@ public partial class MainForm : Form
 
 	private void Game_GameExit()
 	{
-		_game.Stop();
-		this.KeyDown -= MainForm_GameKeyDown;
-		_game.GameExit -= Game_GameExit;
-		StartMenu();
+		if (_game is not null)
+		{
+			_game.Stop();
+			this.KeyDown -= MainForm_GameKeyDown;
+			_game.GameExit -= Game_GameExit;
+			StartMenu();
+		}
 	}
 
 	private void MainForm_MenuKeyDown(object? sender, KeyEventArgs e)
@@ -100,7 +102,7 @@ public partial class MainForm : Form
 	}
 
 	private void MainForm_GameKeyDown(object? sender, KeyEventArgs e)
-		=> _game.DoAction(e.KeyCode);
+		=> _game?.DoAction(e.KeyCode);
 
 	private void Main_Paint(object? sender, PaintEventArgs e)
 	{
@@ -110,7 +112,7 @@ public partial class MainForm : Form
 				_mainMenu.Draw(e.Graphics);
 				break;
 			case ApplicationState.ActiveGame:
-				_game.Draw(e.Graphics);
+				_game?.Draw(e.Graphics);
 				break;
 			case ApplicationState.GameOver:
 				break;
