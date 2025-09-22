@@ -8,6 +8,7 @@ public partial class MainView : Window
 	public MainView()
 	{
 		InitializeComponent();
-		DataContext = new MainViewModel();
+		//DataContext = new MainViewModel();
+		DataContext = new GameViewModel();
 	}
 }
